@@ -2,18 +2,110 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketplace — FarmConnect</title>
+<meta name="description" content="Browse fresh produce from verified Nigerian farmers. Filter by category, state, price range, quality grade, harvest date, and more.">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#14532d">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="FarmConnect">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Marketplace — FarmConnect</title>
-<meta name="description" content="Browse fresh produce from verified Nigerian farmers. Filter by category, state, price, and organic status.">
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/responsive.css">
 <link rel="stylesheet" href="/css/animations.css">
+<style>
+  .marketplace-layout { display: grid; grid-template-columns: 300px 1fr; gap: 2rem; margin-top: 2rem; }
+  .filter-panel {
+    background: #fff; border-radius: var(--radius); box-shadow: var(--shadow);
+    border: 1px solid var(--border); padding: 1.25rem;
+    align-self: start; position: sticky; top: 90px;
+    max-height: calc(100vh - 110px); overflow-y: auto;
+  }
+  .filter-group { margin-bottom: 1.5rem; }
+  .filter-group:last-child { margin-bottom: 0; }
+  .filter-group h4 {
+    font-size: .82rem; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--forest); margin-bottom: .75rem; font-weight: 700;
+  }
+  .filter-group input[type="text"],
+  .filter-group input[type="number"],
+  .filter-group input[type="date"],
+  .filter-group select {
+    width: 100%; padding: .55rem .7rem; font-size: .88rem;
+    border: 1px solid var(--border); border-radius: 8px;
+  }
+  .filter-group input:focus,
+  .filter-group select:focus {
+    outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(22,163,74,.15);
+  }
+  .filter-checkbox {
+    display: flex; align-items: center; gap: .5rem;
+    padding: .4rem 0; font-size: .88rem; cursor: pointer;
+  }
+  .filter-checkbox input { width: 16px; height: 16px; cursor: pointer; }
+  .dual-range { position: relative; height: 40px; margin-top: .5rem; }
+  .dual-range input[type="range"] {
+    position: absolute; width: 100%; pointer-events: none;
+    -webkit-appearance: none; background: transparent;
+  }
+  .dual-range input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; pointer-events: all;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--forest); cursor: pointer;
+    border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  }
+  .dual-range input[type="range"]::-moz-range-thumb {
+    pointer-events: all; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--forest); cursor: pointer; border: 2px solid #fff;
+  }
+  .dual-range-track {
+    position: absolute; top: 50%; left: 0; right: 0; height: 4px;
+    background: var(--border); border-radius: 2px; transform: translateY(-50%);
+  }
+  .dual-range-fill {
+    position: absolute; top: 50%; height: 4px;
+    background: var(--green); border-radius: 2px; transform: translateY(-50%);
+  }
+  .dual-range-values {
+    display: flex; justify-content: space-between;
+    font-size: .82rem; color: var(--muted); margin-top: .25rem;
+  }
+  .filter-actions { display: flex; gap: .5rem; margin-top: 1rem; }
+  .active-filters {
+    display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1rem;
+  }
+  .filter-chip {
+    display: inline-flex; align-items: center; gap: .3rem;
+    padding: .3rem .65rem; background: var(--beige);
+    border-radius: 999px; font-size: .78rem; font-weight: 600;
+  }
+  .filter-chip button {
+    background: none; border: none; cursor: pointer; color: var(--muted);
+    font-size: .9rem; line-height: 1; padding: 0;
+  }
+  .filter-chip button:hover { color: var(--danger); }
+  .preset-list { display: flex; flex-direction: column; gap: .4rem; margin-top: .5rem; }
+  .preset-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .5rem .7rem; background: var(--beige); border-radius: 8px;
+    font-size: .85rem; cursor: pointer; transition: background .15s;
+  }
+  .preset-item:hover { background: #efe9dc; }
+  .preset-item button { background: none; border: none; cursor: pointer; color: var(--danger); font-size: 1.1rem; }
+  .mobile-filter-toggle { display: none; }
+
+  @media (max-width: 900px) {
+    .marketplace-layout { grid-template-columns: 1fr; }
+    .filter-panel {
+      position: static; max-height: none; display: none;
+    }
+    .filter-panel.open { display: block; }
+    .mobile-filter-toggle {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; padding: .85rem 1rem; background: #fff;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      font-weight: 700; color: var(--forest); cursor: pointer; margin-bottom: 1rem;
+    }
+  }
+</style>
 </head>
 <body>
 <nav class="navbar" id="navbar"></nav>
@@ -23,32 +115,111 @@
     <h1 class="section-title">Marketplace</h1>
     <p class="section-sub">Discover fresh produce from verified farmers nationwide</p>
 
-    <div class="card mb-4"><div class="card-body">
-      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;gap:.75rem;align-items:end">
-        <div class="form-group" style="margin-bottom:0"><label>Search</label><input class="form-control" id="search" placeholder="Tomatoes, maize..."></div>
-        <div class="form-group" style="margin-bottom:0"><label>Category</label><select class="form-control" id="category"><option value="">All</option></select></div>
-        <div class="form-group" style="margin-bottom:0"><label>State</label><input class="form-control" id="state" placeholder="e.g. Kaduna"></div>
-        <div class="form-group" style="margin-bottom:0"><label>Sort</label><select class="form-control" id="sort">
-          <option value="newest">Newest</option>
-          <option value="price-asc">Price ↑</option>
-          <option value="price-desc">Price ↓</option>
-          <option value="popular">Popular</option>
-        </select></div>
-        <div class="form-group" style="margin-bottom:0"><label>Organic</label><select class="form-control" id="organic">
-          <option value="">Any</option>
-          <option value="true">Organic only</option>
-        </select></div>
-        <button class="btn btn-primary" id="applyBtn" style="height:44px">Apply</button>
-      </div>
-    </div></div>
+    <button class="mobile-filter-toggle" id="mobileFilterToggle">
+      <span>🔍 Filters</span>
+      <span id="mobileFilterCount"></span>
+    </button>
 
-    <div class="flex justify-between items-center mb-2">
-      <p class="text-muted" id="resultCount">Loading...</p>
-      <button class="btn btn-secondary btn-sm" id="clearBtn">Clear filters</button>
+    <div class="marketplace-layout">
+      <aside class="filter-panel" id="filterPanel">
+        <div class="filter-group">
+          <h4>Search</h4>
+          <input type="text" id="f-search" placeholder="Tomatoes, maize...">
+        </div>
+
+        <div class="filter-group">
+          <h4>Category</h4>
+          <select id="f-category"><option value="">All categories</option></select>
+        </div>
+
+        <div class="filter-group">
+          <h4>State</h4>
+          <input type="text" id="f-state" placeholder="e.g. Kaduna">
+        </div>
+
+        <div class="filter-group">
+          <h4>Price Range (₦)</h4>
+          <div class="dual-range">
+            <div class="dual-range-track"></div>
+            <div class="dual-range-fill" id="priceFill"></div>
+            <input type="range" id="f-price-min" min="0" max="10000" step="50" value="0">
+            <input type="range" id="f-price-max" min="0" max="10000" step="50" value="10000">
+          </div>
+          <div class="dual-range-values">
+            <span id="priceMinLabel">₦0</span>
+            <span id="priceMaxLabel">₦10,000+</span>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <h4>Minimum Quantity</h4>
+          <input type="number" id="f-minQty" min="0" placeholder="e.g. 100">
+        </div>
+
+        <div class="filter-group">
+          <h4>Quality Grade</h4>
+          <label class="filter-checkbox"><input type="checkbox" class="f-grade" value="A"> Grade A (Premium)</label>
+          <label class="filter-checkbox"><input type="checkbox" class="f-grade" value="B"> Grade B (Good)</label>
+          <label class="filter-checkbox"><input type="checkbox" class="f-grade" value="C"> Grade C (Standard)</label>
+        </div>
+
+        <div class="filter-group">
+          <h4>Availability</h4>
+          <select id="f-availability">
+            <option value="">Any status</option>
+            <option value="available">Available</option>
+            <option value="paused">Paused</option>
+            <option value="sold">Sold</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <h4>Harvest Date</h4>
+          <input type="date" id="f-harvestFrom" style="margin-bottom:.4rem">
+          <input type="date" id="f-harvestTo">
+        </div>
+
+        <div class="filter-group">
+          <h4>Attributes</h4>
+          <label class="filter-checkbox"><input type="checkbox" id="f-organic"> Organic only</label>
+          <label class="filter-checkbox"><input type="checkbox" id="f-featured"> Featured only</label>
+        </div>
+
+        <div class="filter-group">
+          <h4>Sort</h4>
+          <select id="f-sort">
+            <option value="newest">Newest first</option>
+            <option value="price-asc">Price: Low → High</option>
+            <option value="price-desc">Price: High → Low</option>
+            <option value="quantity-desc">Largest quantity</option>
+            <option value="popular">Most viewed</option>
+            <option value="favorites">Most favorited</option>
+          </select>
+        </div>
+
+        <div class="filter-actions">
+          <button class="btn btn-primary btn-sm" id="applyFilters" style="flex:1">Apply</button>
+          <button class="btn btn-secondary btn-sm" id="resetFilters" style="flex:1">Reset</button>
+        </div>
+
+        <div class="filter-group" id="presetSection" style="margin-top:1.5rem;display:none">
+          <h4>Saved Presets</h4>
+          <div class="preset-list" id="presetList"></div>
+          <button class="btn btn-outline btn-sm mt-1" id="savePresetBtn" style="width:100%">💾 Save current filters</button>
+        </div>
+      </aside>
+
+      <main>
+        <div class="flex justify-between items-center mb-2 flex-wrap gap-1">
+          <p class="text-muted" id="resultCount">Loading...</p>
+        </div>
+
+        <div class="active-filters" id="activeFilters"></div>
+
+        <div class="product-grid" id="grid"></div>
+        <div id="pagination" class="flex justify-center gap-1 mt-4 flex-wrap"></div>
+      </main>
     </div>
-
-    <div class="product-grid" id="grid"></div>
-    <div id="pagination" class="flex justify-center gap-1 mt-4 flex-wrap"></div>
   </div>
 </section>
 
@@ -58,4 +229,3 @@
 <script src="/js/marketplace.js"></script>
 </body>
 </html>
-

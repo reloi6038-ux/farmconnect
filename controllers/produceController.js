@@ -28,27 +28,47 @@ const createProduce = async (req, res, next) => {
 const listProduce = async (req, res, next) => {
   try {
     const {
-      search, category, location, state, minPrice, maxPrice,
-      availability, organic, sort, page = 1, limit = 12
+      search, category, location, state,
+      minPrice, maxPrice, minQuantity,
+      availability, organic, featured, grade,
+      harvestFrom, harvestTo,
+      sort, page = 1, limit = 12
     } = req.query;
 
     const q = { approved: true };
+
     if (search) q.productName = { $regex: search, $options: 'i' };
     if (category) q.category = category;
     if (location) q.location = { $regex: location, $options: 'i' };
     if (state) q.state = state;
+
     if (minPrice || maxPrice) q.price = {};
     if (minPrice) q.price.$gte = Number(minPrice);
     if (maxPrice) q.price.$lte = Number(maxPrice);
+
+    if (minQuantity) q.quantity = { $gte: Number(minQuantity) };
+
     if (availability) q.availabilityStatus = availability;
     if (organic === 'true') q.organic = true;
+    if (featured === 'true') q.featured = true;
+
+    if (grade) {
+      const grades = String(grade).split(',').map((g) => g.trim()).filter(Boolean);
+      if (grades.length > 0) q.qualityGrade = { $in: grades };
+    }
+
+    if (harvestFrom || harvestTo) q.harvestDate = {};
+    if (harvestFrom) q.harvestDate.$gte = new Date(harvestFrom);
+    if (harvestTo) q.harvestDate.$lte = new Date(harvestTo);
 
     const sortMap = {
       newest: { createdAt: -1 },
       oldest: { createdAt: 1 },
       'price-asc': { price: 1 },
       'price-desc': { price: -1 },
-      popular: { views: -1 }
+      'quantity-desc': { quantity: -1 },
+      popular: { views: -1 },
+      favorites: { favoriteCount: -1 }
     };
     const sortBy = sortMap[sort] || { createdAt: -1 };
 
@@ -204,3 +224,4 @@ module.exports = {
   relatedProduce,
   uploadImages
 };
+
