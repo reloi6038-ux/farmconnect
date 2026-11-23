@@ -84,7 +84,28 @@ const daysAgo = (n) => new Date(Date.now() - n * 24 * 60 * 60 * 1000);
     { user: farmers[2]._id, name: 'Yusuf Bello', role: 'farmer', location: 'Kano, Kano', rating: 5, title: 'Wholesalers now come to me', body: 'I used to drive my rice and sorghum to three markets looking for buyers. Now wholesalers find my listings on FarmConnect, send enquiries, and I fulfil directly. Way less time on the road, way more time on the farm.', status: 'approved', featured: false, helpful: 26, createdAt: daysAgo(6) }
   ];
   await Review.insertMany(reviewData);
-  console.log(`[seed] ${reviewData.length} reviews`);
+  console.log(`[seed] ${reviewData.length} platform reviews`);
+
+  // Produce-scoped reviews (need produce + enquiry context)
+  const Produce = require('../models/Produce');
+  const Enquiry = require('../models/Enquiry');
+  const produces = await Produce.find({}).limit(4);
+  if (produces.length >= 2) {
+    const produceReviews = [
+      { user: buyers[0]._id, name: buyers[0].name, role: 'buyer', location: buyers[0].location, rating: 5, title: 'Excellent freshness', body: 'The tomatoes arrived same day and were perfect. Zero spoilage, exact weight as promised.', produce: produces[0]._id, farmer: produces[0].farmer, status: 'approved' },
+      { user: buyers[1]._id, name: buyers[1].name, role: 'buyer', location: buyers[1].location, rating: 4, title: 'Great quality, slight delay', body: 'Produce was top quality but delivery was a few hours later than expected. Farmer communicated well.', produce: produces[0]._id, farmer: produces[0].farmer, status: 'approved' },
+      { user: buyers[0]._id, name: buyers[0].name, role: 'buyer', location: buyers[0].location, rating: 5, title: 'Best yams I have sourced', body: 'Organic yam tubers were substantial, firm, and true organic. My restaurant customers noticed immediately.', produce: produces[1]._id, farmer: produces[1].farmer, status: 'approved' }
+    ];
+    await Review.insertMany(produceReviews);
+    // Recompute ratings on affected produce
+    for (const pid of new Set(produceReviews.map(r => r.produce.toString()))) {
+      const agg = await Review.aggregate([{ $match: { produce: require('mongoose').Types.ObjectId.createFromHexString(pid), status: 'approved' } }, { $group: { _id: null, avg: { $avg: '$rating' }, count: { $sum: 1 } } }]);
+      if (agg[0]) {
+        await Produce.findByIdAndUpdate(pid, { rating: Math.round(agg[0].avg * 10) / 10, reviewCount: agg[0].count });
+      }
+    }
+    console.log(`[seed] ${produceReviews.length} produce reviews`);
+  }
 
   const notifs = [];
   for (const u of [...farmers, ...buyers]) {
@@ -108,3 +129,4 @@ const daysAgo = (n) => new Date(Date.now() - n * 24 * 60 * 60 * 1000);
   await mongoose.disconnect();
   process.exit(0);
 })().catch((e) => { console.error(e); process.exit(1); });
+

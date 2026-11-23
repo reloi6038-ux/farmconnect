@@ -5,6 +5,9 @@ const MarketPrice = require('../models/MarketPrice');
 const ContactMessage = require('../models/ContactMessage');
 const Category = require('../models/Category');
 const Review = require('../models/Review');
+const Favorite = require('../models/Favorite');
+const Notification = require('../models/Notification');
+const FarmerProfile = require('../models/FarmerProfile');
 
 const stats = async (req, res, next) => {
   try {
@@ -121,6 +124,60 @@ const verifyUser = async (req, res, next) => {
   } catch (e) { next(e); }
 };
 
+const unverifyUser = async (req, res, next) => {
+  try {
+    const u = await User.findByIdAndUpdate(req.params.id, { verified: false }, { new: true }).select('-password');
+    if (!u) return res.status(404).json({ success: false, message: 'User not found' });
+    res.json({ success: true, data: u });
+  } catch (e) { next(e); }
+};
+
+const deleteUser = async (req, res, next) => {
+  try {
+    const u = await User.findById(req.params.id);
+    if (!u) return res.status(404).json({ success: false, message: 'User not found' });
+    if (u.role === 'admin') return res.status(400).json({ success: false, message: 'Cannot delete admin accounts' });
+    if (u._id.toString() === req.user._id.toString()) {
+      return res.status(400).json({ success: false, message: 'Cannot delete your own account' });
+    }
+
+    // Cascade cleanup: everything the user owns
+    const produceIds = (await Produce.find({ farmer: u._id }).select('_id')).map((p) => p._id);
+
+    const cleanup = await Promise.all([
+      Produce.deleteMany({ farmer: u._id }),
+      FarmerProfile.deleteMany({ user: u._id }),
+      Enquiry.deleteMany({ $or: [{ buyer: u._id }, { farmer: u._id }] }),
+      Review.deleteMany({ user: u._id }),
+      Favorite.deleteMany({ buyer: u._id }),
+      Notification.deleteMany({ recipient: u._id })
+    ]);
+
+    // Also remove favorites + reviews that reference this user's produce
+    if (produceIds.length > 0) {
+      await Promise.all([
+        Favorite.deleteMany({ produce: { $in: produceIds } }),
+        Review.deleteMany({ produce: { $in: produceIds } })
+      ]);
+    }
+
+    await u.deleteOne();
+
+    res.json({
+      success: true,
+      message: 'User and all associated data deleted',
+      data: {
+        deletedUser: u._id,
+        produceRemoved: cleanup[0].deletedCount,
+        enquiriesRemoved: cleanup[2].deletedCount,
+        reviewsRemoved: cleanup[3].deletedCount,
+        favoritesRemoved: cleanup[4].deletedCount,
+        notificationsRemoved: cleanup[5].deletedCount
+      }
+    });
+  } catch (e) { next(e); }
+};
+
 const listAllProduce = async (req, res, next) => {
   try {
     const q = {};
@@ -166,7 +223,33 @@ const listAllEnquiries = async (req, res, next) => {
   } catch (e) { next(e); }
 };
 
+const listAllReviews = async (req, res, next) => {
+  try {
+    const q = {};
+    if (req.query.status && req.query.status !== 'all') q.status = req.query.status;
+    const items = await Review.find(q)
+      .populate('produce', 'productName price unit images')
+      .populate('farmer', 'name email state')
+      .populate('user', 'name email role')
+      .sort({ createdAt: -1 })
+      .limit(200);
+    res.json({ success: true, data: items });
+  } catch (e) { next(e); }
+};
+
 module.exports = {
-  stats, analytics, listUsers, getUser, toggleUserStatus, verifyUser,
-  listAllProduce, featureProduce, approveProduce, deleteProduceAdmin, listAllEnquiries
+  stats,
+  analytics,
+  listUsers,
+  getUser,
+  toggleUserStatus,
+  verifyUser,
+  unverifyUser,
+  deleteUser,
+  listAllProduce,
+  featureProduce,
+  approveProduce,
+  deleteProduceAdmin,
+  listAllEnquiries,
+  listAllReviews
 };

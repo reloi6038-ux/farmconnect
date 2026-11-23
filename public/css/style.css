@@ -294,3 +294,17 @@ tr:hover td { background: rgba(245, 240, 230, .5); }
   .hero-visual { min-height: 260px; padding: .5rem; }
   .hero-visual .germ { max-width: 320px; }
 }
+
+/* star rating (used by produce reviews) */
+.stars { display: inline-flex; gap: 2px; color: #d1d5db; font-size: 1.05rem; }
+.stars .filled { color: #f59e0b; }
+.star-input { display: inline-flex; gap: 4px; font-size: 1.8rem; cursor: pointer; user-select: none; }
+.star-input span { color: #d1d5db; transition: color .15s ease, transform .15s ease; }
+.star-input span:hover,
+.star-input span.active { color: #f59e0b; transform: scale(1.08); }
+.avatar-circle {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: linear-gradient(135deg, #14532d, #22c55e);
+  display: grid; place-items: center; color: #fff; font-weight: 700; font-size: .9rem;
+  flex-shrink: 0;
+}

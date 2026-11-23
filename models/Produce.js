@@ -21,9 +21,12 @@ const produceSchema = new mongoose.Schema({
   views: { type: Number, default: 0 },
   favoriteCount: { type: Number, default: 0 },
   featured: { type: Boolean, default: false },
-  approved: { type: Boolean, default: true }
+  approved: { type: Boolean, default: true },
+  rating: { type: Number, default: 0, min: 0, max: 5 },
+  reviewCount: { type: Number, default: 0 }
 }, { timestamps: true });
 
 produceSchema.index({ productName: 'text', description: 'text' });
 
 module.exports = mongoose.model('Produce', produceSchema);
+

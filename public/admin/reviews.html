@@ -3,9 +3,76 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Reviews — FarmConnect</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#14532d">
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/responsive.css">
 <link rel="stylesheet" href="/css/admin.css">
+<style>
+  .review-counters { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .counter-card {
+    background: #fff; border-radius: 12px; padding: 1.1rem 1.25rem;
+    box-shadow: var(--shadow); border: 1px solid var(--border);
+  }
+  .counter-label { font-size: .74rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; }
+  .counter-value { font-size: 1.75rem; font-weight: 800; color: var(--forest); margin-top: .2rem; line-height: 1.1; }
+  .counter-sub { font-size: .78rem; color: var(--muted); margin-top: .25rem; }
+
+  .toolbar {
+    display: flex; gap: .75rem; flex-wrap: wrap; align-items: center;
+    background: #fff; padding: 1rem; border-radius: 12px;
+    box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 1.25rem;
+  }
+  .toolbar input, .toolbar select {
+    padding: .55rem .75rem; border: 1px solid var(--border);
+    border-radius: 8px; font-size: .88rem; font-family: inherit;
+  }
+  .toolbar input { flex: 1 1 220px; }
+  .toolbar select { flex: 0 0 auto; }
+
+  .stars { display: inline-flex; gap: 1px; font-size: .95rem; color: #d1d5db; }
+  .stars .filled { color: #f59e0b; }
+
+  .type-badge {
+    display: inline-flex; align-items: center; gap: .25rem;
+    padding: .2rem .55rem; border-radius: 6px;
+    font-size: .72rem; font-weight: 700; letter-spacing: .02em;
+  }
+  .type-platform { background: #dbeafe; color: #1e40af; }
+  .type-produce  { background: #dcfce7; color: #14532d; }
+
+  .row-actions { display: flex; gap: .35rem; flex-wrap: wrap; }
+  .row-actions .btn { padding: .3rem .6rem; font-size: .75rem; }
+
+  .review-body-preview {
+    color: var(--muted); font-size: .82rem; line-height: 1.5;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; max-width: 320px;
+  }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 1500; display: none; place-items: center; padding: 1rem; backdrop-filter: blur(4px); }
+  .modal-overlay.open { display: grid; }
+  .modal { background: #fff; border-radius: 14px; box-shadow: var(--shadow-lg); max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; animation: modalIn .25s ease; }
+  .modal-body { padding: 1.75rem; }
+  .modal h3 { margin-bottom: 1rem; color: var(--forest); }
+
+  .bulk-bar {
+    display: none; align-items: center; gap: .75rem; flex-wrap: wrap;
+    padding: .85rem 1.25rem; background: var(--forest); color: #fff;
+    border-radius: 10px; margin-bottom: 1rem;
+  }
+  .bulk-bar.visible { display: flex; }
+  .bulk-bar strong { color: #fff; }
+  .bulk-bar button { padding: .4rem .85rem; font-size: .82rem; }
+
+  @media (max-width: 900px) {
+    .review-table thead { display: none; }
+    .review-table tr { display: block; margin-bottom: 1rem; border: 1px solid var(--border); border-radius: 10px; padding: .75rem; background: #fff; }
+    .review-table td { display: block; padding: .35rem 0; border: none; }
+    .review-table td::before { content: attr(data-label) ': '; font-weight: 700; color: var(--forest); font-size: .78rem; }
+    .review-body-preview { max-width: none; }
+  }
+</style>
 </head><body>
 <div class="admin-layout">
   <aside class="admin-sidebar">
@@ -23,52 +90,412 @@
       <a href="#" id="adminLogout">Logout</a>
     </nav>
   </aside>
+
   <main class="admin-content">
-    <h1 style="color:var(--forest);margin-bottom:1.5rem">Reviews Moderation</h1>
-    <div id="adminRoot">Loading…</div>
+    <div class="flex justify-between items-center" style="margin-bottom:1.25rem;flex-wrap:wrap;gap:1rem">
+      <h1 style="color:var(--forest);font-size:1.6rem;margin:0">Reviews Moderation</h1>
+      <button class="btn btn-secondary btn-sm" id="refreshBtn">↻ Refresh</button>
+    </div>
+
+    <div class="review-counters" id="counters">
+      <div class="counter-card"><div class="counter-label">Total</div><div class="counter-value" id="cTotal">—</div></div>
+      <div class="counter-card"><div class="counter-label">Pending</div><div class="counter-value" id="cPending" style="color:#b45309">—</div></div>
+      <div class="counter-card"><div class="counter-label">Approved</div><div class="counter-value" id="cApproved" style="color:var(--green)">—</div></div>
+      <div class="counter-card"><div class="counter-label">Rejected</div><div class="counter-value" id="cRejected" style="color:var(--danger)">—</div></div>
+      <div class="counter-card"><div class="counter-label">Average Rating</div><div class="counter-value" id="cAvg">—</div><div class="counter-sub" id="cAvgSub">across all approved</div></div>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" id="searchInput" placeholder="Search by name, title, or body...">
+      <select id="statusFilter">
+        <option value="all">All statuses</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+      <select id="typeFilter">
+        <option value="all">All types</option>
+        <option value="platform">Platform reviews</option>
+        <option value="produce">Produce reviews</option>
+      </select>
+      <select id="ratingFilter">
+        <option value="0">All ratings</option>
+        <option value="5">5 stars</option>
+        <option value="4">4 stars</option>
+        <option value="3">3 stars</option>
+        <option value="2">2 stars</option>
+        <option value="1">1 star</option>
+      </select>
+    </div>
+
+    <div class="bulk-bar" id="bulkBar">
+      <strong id="bulkCount">0 selected</strong>
+      <button class="btn btn-primary btn-sm" id="bulkApprove">Approve selected</button>
+      <button class="btn btn-danger btn-sm" id="bulkReject">Reject selected</button>
+      <button class="btn btn-secondary btn-sm" id="bulkClear">Clear</button>
+    </div>
+
+    <div id="reviewsRoot">
+      <p class="text-muted">Loading reviews…</p>
+    </div>
   </main>
 </div>
+
+<!-- Review detail modal -->
+<div class="modal-overlay" id="reviewModal">
+  <div class="modal">
+    <div class="modal-body">
+      <div class="flex justify-between items-center mb-3">
+        <h3 style="margin:0">Review Details</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeReviewModal()">×</button>
+      </div>
+      <div id="reviewModalBody"></div>
+    </div>
+  </div>
+</div>
+
 <script src="/js/api.js"></script>
 <script src="/js/components.js"></script>
 <script>
 if (!requireAuth('admin')) throw new Error('auth');
 document.getElementById('adminLogout').onclick = (e) => { e.preventDefault(); clearSession(); location.href = '/admin/login.html'; };
 
-async function load() {
-  const root = document.getElementById('adminRoot');
-  try {
-    const r = await API.get('/reviews?status=all&limit=50');
-    if (!r.data.length) { root.innerHTML = '<div class="empty-state"><div class="emoji">⭐</div><p>No reviews yet.</p></div>'; return; }
-    root.innerHTML = `
-      <div class="table-wrap"><table><thead><tr>
-        <th>Reviewer</th><th>Rating</th><th>Title</th><th>Status</th><th>Date</th><th>Actions</th>
-      </tr></thead><tbody>
-      ${r.data.map(rv => `
-        <tr>
-          <td><strong>${escapeHtml(rv.name)}</strong><br><small class="text-muted">${escapeHtml(rv.role)} · ${escapeHtml(rv.location || '—')}</small></td>
-          <td>${'★'.repeat(rv.rating)}${'☆'.repeat(5 - rv.rating)}</td>
-          <td>${escapeHtml(rv.title)}</td>
-          <td><span class="badge ${rv.status === 'approved' ? 'badge-green' : rv.status === 'pending' ? 'badge-gold' : 'badge-red'}">${escapeHtml(rv.status)}</span></td>
-          <td class="text-muted" style="font-size:.85rem">${fmtRelative(rv.createdAt)}</td>
-          <td>
-            ${rv.status !== 'approved' ? `<button class="btn btn-primary btn-sm" data-approve="${rv._id}">Approve</button>` : ''}
-            ${rv.status !== 'rejected' ? `<button class="btn btn-secondary btn-sm" data-reject="${rv._id}">Reject</button>` : ''}
-            <button class="btn btn-danger btn-sm" data-del="${rv._id}">Delete</button>
-          </td>
-        </tr>`).join('')}
-      </tbody></table></div>`;
+// ---------- State ----------
+let allReviews = [];
+let filteredReviews = [];
+let selectedIds = new Set();
+let currentFilters = { search: '', status: 'all', type: 'all', rating: 0 };
 
-    root.querySelectorAll('[data-approve]').forEach(b => b.onclick = async () => { await API.patch('/reviews/' + b.dataset.approve + '/moderate', { status: 'approved' }); load(); });
-    root.querySelectorAll('[data-reject]').forEach(b => b.onclick = async () => { await API.patch('/reviews/' + b.dataset.reject + '/moderate', { status: 'rejected' }); load(); });
-    root.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
-      if (!confirm('Delete this review permanently?')) return;
-      await API.delete('/reviews/' + b.dataset.del);
-      load();
-    });
+// ---------- Helpers ----------
+function starsHtml(rating) {
+  return `<span class="stars">${[1,2,3,4,5].map(i => `<span class="${i <= rating ? 'filled' : ''}">★</span>`).join('')}</span>`;
+}
+
+function statusBadge(status) {
+  const cls = status === 'approved' ? 'badge-green' : status === 'pending' ? 'badge-gold' : 'badge-red';
+  return `<span class="badge ${cls}">${status}</span>`;
+}
+
+function typeBadge(rv) {
+  return rv.produce
+    ? `<span class="type-badge type-produce">🌾 Produce</span>`
+    : `<span class="type-badge type-platform">🛡️ Platform</span>`;
+}
+
+function truncate(str, n) {
+  if (!str) return '';
+  return str.length > n ? str.slice(0, n) + '…' : str;
+}
+
+function escapeHtmlLocal(str) {
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// ---------- Data fetch ----------
+async function loadReviews() {
+  document.getElementById('reviewsRoot').innerHTML = '<p class="text-muted">Loading reviews…</p>';
+  try {
+    const r = await API.get('/reviews?status=all&limit=200');
+    // Note: /api/reviews only returns platform reviews (produce: null).
+    // For produce reviews, fetch per-produce. For admin view, call /api/admin/reviews (if exists) or fall back to union.
+    let produceReviews = [];
+    try {
+      const pr = await API.get('/admin/reviews');
+      if (pr && Array.isArray(pr.data)) produceReviews = pr.data;
+    } catch (_) {}
+
+    allReviews = [...(r.data || []), ...produceReviews];
+    // Dedup by _id
+    const seen = new Set();
+    allReviews = allReviews.filter(rv => { if (seen.has(rv._id)) return false; seen.add(rv._id); return true; });
+
+    updateCounters();
+    applyFilters();
   } catch (e) {
-    root.innerHTML = `<p style="color:var(--danger)">${escapeHtml(e.message)}</p>`;
+    document.getElementById('reviewsRoot').innerHTML = `<p style="color:var(--danger)">${escapeHtmlLocal(e.message)}</p>`;
   }
 }
-load();
+
+function updateCounters() {
+  const total = allReviews.length;
+  const pending = allReviews.filter(r => r.status === 'pending').length;
+  const approved = allReviews.filter(r => r.status === 'approved').length;
+  const rejected = allReviews.filter(r => r.status === 'rejected').length;
+  const approvedRatings = allReviews.filter(r => r.status === 'approved').map(r => r.rating);
+  const avg = approvedRatings.length ? (approvedRatings.reduce((a,b)=>a+b,0) / approvedRatings.length) : 0;
+
+  document.getElementById('cTotal').textContent = total;
+  document.getElementById('cPending').textContent = pending;
+  document.getElementById('cApproved').textContent = approved;
+  document.getElementById('cRejected').textContent = rejected;
+  document.getElementById('cAvg').textContent = avg ? avg.toFixed(1) + ' / 5' : '—';
+  document.getElementById('cAvgSub').textContent = `from ${approvedRatings.length} approved`;
+}
+
+// ---------- Filtering ----------
+function applyFilters() {
+  const { search, status, type, rating } = currentFilters;
+  filteredReviews = allReviews.filter(rv => {
+    if (status !== 'all' && rv.status !== status) return false;
+    if (type === 'platform' && rv.produce) return false;
+    if (type === 'produce' && !rv.produce) return false;
+    if (rating > 0 && rv.rating !== rating) return false;
+    if (search) {
+      const s = search.toLowerCase();
+      const hay = [rv.name, rv.title, rv.body, rv.location].filter(Boolean).join(' ').toLowerCase();
+      if (!hay.includes(s)) return false;
+    }
+    return true;
+  });
+  renderTable();
+}
+
+// ---------- Render ----------
+function renderTable() {
+  const root = document.getElementById('reviewsRoot');
+  if (!filteredReviews.length) {
+    root.innerHTML = `<div class="empty-state"><div class="emoji">⭐</div><h3>No reviews match your filters</h3><p class="text-muted mt-1">Try clearing filters or adjusting your search.</p></div>`;
+    return;
+  }
+
+  const rows = filteredReviews.map(rv => {
+    const initials = (rv.name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    const checked = selectedIds.has(rv._id) ? 'checked' : '';
+    const produceName = rv.produce && rv.produce.productName ? rv.produce.productName : '';
+    const farmerName = rv.farmer && rv.farmer.name ? rv.farmer.name : (rv.produce && rv.produce.farmer ? rv.produce.farmer.name : '');
+
+    return `
+      <tr data-id="${rv._id}">
+        <td data-label="Select"><input type="checkbox" class="row-check" data-id="${rv._id}" ${checked}></td>
+        <td data-label="Reviewer">
+          <div style="display:flex;align-items:center;gap:.6rem">
+            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#14532d,#22c55e);display:grid;place-items:center;color:#fff;font-weight:700;font-size:.78rem;flex-shrink:0">${initials}</div>
+            <div><strong>${escapeHtmlLocal(rv.name)}</strong><br><small class="text-muted">${escapeHtmlLocal(rv.role)}${rv.location ? ' · ' + escapeHtmlLocal(rv.location) : ''}</small></div>
+          </div>
+        </td>
+        <td data-label="Type">${typeBadge(rv)}</td>
+        <td data-label="Rating">${starsHtml(rv.rating)} <span style="font-size:.8rem;color:var(--muted)">${rv.rating}/5</span></td>
+        <td data-label="Review">
+          <strong style="color:var(--forest)">${escapeHtmlLocal(rv.title)}</strong>
+          <div class="review-body-preview">${escapeHtmlLocal(rv.body)}</div>
+          ${produceName ? `<div style="font-size:.75rem;color:var(--muted);margin-top:.3rem">🌾 ${escapeHtmlLocal(produceName)}${farmerName ? ' · by ' + escapeHtmlLocal(farmerName) : ''}</div>` : ''}
+        </td>
+        <td data-label="Status">${statusBadge(rv.status)}${rv.featured ? ' <span class="badge badge-gold" style="margin-left:.3rem">Featured</span>' : ''}</td>
+        <td data-label="Date"><small class="text-muted">${fmtRelative(rv.createdAt)}</small></td>
+        <td data-label="Actions">
+          <div class="row-actions">
+            <button class="btn btn-secondary btn-sm" data-action="view" data-id="${rv._id}">View</button>
+            ${rv.status !== 'approved' ? `<button class="btn btn-primary btn-sm" data-action="approve" data-id="${rv._id}">Approve</button>` : ''}
+            ${rv.status !== 'rejected' ? `<button class="btn btn-secondary btn-sm" data-action="reject" data-id="${rv._id}">Reject</button>` : ''}
+            <button class="btn btn-danger btn-sm" data-action="delete" data-id="${rv._id}">Delete</button>
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
+
+  root.innerHTML = `
+    <div class="table-wrap">
+      <table class="review-table">
+        <thead><tr>
+          <th style="width:36px"><input type="checkbox" id="selectAll"></th>
+          <th>Reviewer</th>
+          <th>Type</th>
+          <th>Rating</th>
+          <th>Review</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+
+  // Wire row actions
+  root.querySelectorAll('[data-action]').forEach(b => {
+    b.onclick = () => handleAction(b.dataset.action, b.dataset.id);
+  });
+
+  // Wire row checkboxes
+  root.querySelectorAll('.row-check').forEach(c => {
+    c.onchange = () => {
+      if (c.checked) selectedIds.add(c.dataset.id);
+      else selectedIds.delete(c.dataset.id);
+      updateBulkBar();
+    };
+  });
+
+  // Select all
+  const selectAll = document.getElementById('selectAll');
+  if (selectAll) {
+    selectAll.checked = filteredReviews.length > 0 && filteredReviews.every(rv => selectedIds.has(rv._id));
+    selectAll.onchange = () => {
+      if (selectAll.checked) filteredReviews.forEach(rv => selectedIds.add(rv._id));
+      else selectedIds.clear();
+      document.querySelectorAll('.row-check').forEach(c => c.checked = selectAll.checked);
+      updateBulkBar();
+    };
+  }
+
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  const bar = document.getElementById('bulkBar');
+  if (selectedIds.size === 0) { bar.classList.remove('visible'); return; }
+  bar.classList.add('visible');
+  document.getElementById('bulkCount').textContent = `${selectedIds.size} selected`;
+}
+
+// ---------- Actions ----------
+async function handleAction(action, id) {
+  const rv = allReviews.find(r => r._id === id);
+  if (!rv) return;
+
+  if (action === 'view') { openReviewModal(rv); return; }
+
+  if (action === 'approve') {
+    try {
+      await API.patch('/reviews/' + id + '/moderate', { status: 'approved' });
+      rv.status = 'approved';
+      toast('Review approved');
+      updateCounters(); applyFilters();
+    } catch (e) { toast(e.message, 'error'); }
+  }
+
+  if (action === 'reject') {
+    try {
+      await API.patch('/reviews/' + id + '/moderate', { status: 'rejected' });
+      rv.status = 'rejected';
+      toast('Review rejected');
+      updateCounters(); applyFilters();
+    } catch (e) { toast(e.message, 'error'); }
+  }
+
+  if (action === 'delete') {
+    if (!confirm('Delete this review permanently? This cannot be undone.')) return;
+    try {
+      await API.delete('/reviews/' + id);
+      allReviews = allReviews.filter(r => r._id !== id);
+      selectedIds.delete(id);
+      toast('Review deleted');
+      updateCounters(); applyFilters();
+    } catch (e) { toast(e.message, 'error'); }
+  }
+}
+
+async function bulkAction(status) {
+  const ids = Array.from(selectedIds);
+  if (!ids.length) return;
+  if (!confirm(`Set ${ids.length} review(s) to "${status}"?`)) return;
+  let ok = 0, fail = 0;
+  for (const id of ids) {
+    try {
+      await API.patch('/reviews/' + id + '/moderate', { status });
+      const rv = allReviews.find(r => r._id === id);
+      if (rv) rv.status = status;
+      ok++;
+    } catch (_) { fail++; }
+  }
+  selectedIds.clear();
+  toast(`Updated ${ok} review(s)${fail ? ', ' + fail + ' failed' : ''}`, fail ? 'error' : 'success');
+  updateCounters(); applyFilters();
+}
+
+// ---------- Modal ----------
+function openReviewModal(rv) {
+  const initials = (rv.name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+  const produceLine = rv.produce && rv.produce.productName
+    ? `<div style="padding:.6rem .8rem;background:#dcfce7;border-radius:8px;margin-bottom:1rem;font-size:.85rem"><strong>🌾 Produce review</strong><br>${escapeHtmlLocal(rv.produce.productName)}${rv.farmer && rv.farmer.name ? ' · by ' + escapeHtmlLocal(rv.farmer.name) : ''}</div>`
+    : `<div style="padding:.6rem .8rem;background:#dbeafe;border-radius:8px;margin-bottom:1rem;font-size:.85rem"><strong>🛡️ Platform review</strong></div>`;
+
+  document.getElementById('reviewModalBody').innerHTML = `
+    ${produceLine}
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem">
+      <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#14532d,#22c55e);display:grid;place-items:center;color:#fff;font-weight:700;flex-shrink:0">${initials}</div>
+      <div>
+        <strong style="font-size:1.05rem">${escapeHtmlLocal(rv.name)}</strong>
+        <div class="text-muted" style="font-size:.85rem">${escapeHtmlLocal(rv.role)}${rv.location ? ' · ' + escapeHtmlLocal(rv.location) : ''}</div>
+      </div>
+    </div>
+    <div style="margin-bottom:.75rem">${starsHtml(rv.rating)} <strong style="margin-left:.3rem;color:var(--forest)">${rv.rating}/5</strong></div>
+    <h4 style="margin-bottom:.5rem;color:var(--forest)">${escapeHtmlLocal(rv.title)}</h4>
+    <p style="line-height:1.7;margin-bottom:1rem;color:var(--ink)">${escapeHtmlLocal(rv.body)}</p>
+    <div class="flex justify-between items-center" style="padding-top:1rem;border-top:1px solid var(--border);font-size:.82rem;color:var(--muted)">
+      <span>${fmtDate(rv.createdAt)}</span>
+      <span>${statusBadge(rv.status)}</span>
+    </div>
+    <div class="flex gap-1 mt-3" style="flex-wrap:wrap">
+      ${rv.status !== 'approved' ? `<button class="btn btn-primary" onclick="quickModerate('${rv._id}','approved')">Approve</button>` : ''}
+      ${rv.status !== 'rejected' ? `<button class="btn btn-secondary" onclick="quickModerate('${rv._id}','rejected')">Reject</button>` : ''}
+      <button class="btn btn-danger" onclick="quickDelete('${rv._id}')">Delete</button>
+    </div>
+  `;
+  document.getElementById('reviewModal').classList.add('open');
+}
+
+function closeReviewModal() {
+  document.getElementById('reviewModal').classList.remove('open');
+}
+
+async function quickModerate(id, status) {
+  try {
+    await API.patch('/reviews/' + id + '/moderate', { status });
+    const rv = allReviews.find(r => r._id === id);
+    if (rv) rv.status = status;
+    toast('Review ' + status);
+    closeReviewModal();
+    updateCounters(); applyFilters();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function quickDelete(id) {
+  if (!confirm('Delete this review permanently?')) return;
+  try {
+    await API.delete('/reviews/' + id);
+    allReviews = allReviews.filter(r => r._id !== id);
+    selectedIds.delete(id);
+    toast('Review deleted');
+    closeReviewModal();
+    updateCounters(); applyFilters();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+document.getElementById('reviewModal').addEventListener('click', (e) => {
+  if (e.target.id === 'reviewModal') closeReviewModal();
+});
+
+// ---------- Toolbar events ----------
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  currentFilters.search = e.target.value;
+  applyFilters();
+});
+document.getElementById('statusFilter').addEventListener('change', (e) => {
+  currentFilters.status = e.target.value; applyFilters();
+});
+document.getElementById('typeFilter').addEventListener('change', (e) => {
+  currentFilters.type = e.target.value; applyFilters();
+});
+document.getElementById('ratingFilter').addEventListener('change', (e) => {
+  currentFilters.rating = Number(e.target.value); applyFilters();
+});
+
+// ---------- Bulk actions ----------
+document.getElementById('bulkApprove').onclick = () => bulkAction('approved');
+document.getElementById('bulkReject').onclick = () => bulkAction('rejected');
+document.getElementById('bulkClear').onclick = () => {
+  selectedIds.clear();
+  document.querySelectorAll('.row-check').forEach(c => c.checked = false);
+  const all = document.getElementById('selectAll');
+  if (all) all.checked = false;
+  updateBulkBar();
+};
+
+// ---------- Refresh ----------
+document.getElementById('refreshBtn').onclick = loadReviews;
+
+// ---------- Init ----------
+loadReviews();
 </script>
 </body></html>

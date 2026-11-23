@@ -1,37 +1,358 @@
-﻿<!DOCTYPE html><html lang="en"><head>
+﻿<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Users — FarmConnect</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#14532d">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="FarmConnect">
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Users — FarmConnect</title>
-<link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/responsive.css">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/responsive.css">
 <link rel="stylesheet" href="/css/admin.css">
+<style>
+  .user-toolbar {
+    display: flex; gap: .75rem; flex-wrap: wrap; align-items: center;
+    background: #fff; padding: 1rem; border-radius: 12px;
+    box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 1.25rem;
+  }
+  .user-toolbar input, .user-toolbar select {
+    padding: .55rem .75rem; border: 1px solid var(--border);
+    border-radius: 8px; font-size: .88rem; font-family: inherit;
+  }
+  .user-toolbar input { flex: 1 1 220px; }
+  .user-toolbar select { flex: 0 0 auto; }
+
+  .user-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .user-stat {
+    background: #fff; border-radius: 12px; padding: 1rem 1.25rem;
+    box-shadow: var(--shadow); border: 1px solid var(--border);
+  }
+  .user-stat .lbl { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; }
+  .user-stat .val { font-size: 1.6rem; font-weight: 800; color: var(--forest); margin-top: .2rem; }
+
+  .user-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #14532d, #22c55e);
+    display: grid; place-items: center; color: #fff; font-weight: 700; font-size: .82rem;
+    flex-shrink: 0;
+  }
+  .role-badge { display: inline-block; padding: .15rem .5rem; border-radius: 6px; font-size: .7rem; font-weight: 700; }
+  .role-farmer { background: #dcfce7; color: #14532d; }
+  .role-buyer  { background: #dbeafe; color: #1e40af; }
+  .role-admin  { background: #fef3c7; color: #92400e; }
+
+  .row-actions { display: flex; gap: .3rem; flex-wrap: wrap; }
+  .row-actions .btn { padding: .3rem .55rem; font-size: .72rem; }
+
+  @media (max-width: 900px) {
+    .user-table thead { display: none; }
+    .user-table tr { display: block; margin-bottom: 1rem; border: 1px solid var(--border); border-radius: 10px; padding: .75rem; background: #fff; }
+    .user-table td { display: block; padding: .35rem 0; border: none; }
+    .user-table td::before { content: attr(data-label) ': '; font-weight: 700; color: var(--forest); font-size: .78rem; }
+  }
+</style>
 </head><body>
 <div class="admin-layout">
   <aside class="admin-sidebar">
-    <div class="brand"><span class="brand-badge">🌾</span> Admin</div>
+    <div class="brand"><img src="/favicon.svg" alt="" width="32" height="32" style="border-radius:8px"><span style="margin-left:.5rem">Admin</span></div>
     <nav>
-      <a href="/admin/dashboard.html" data-page="dashboard">📊 Dashboard</a>
-      <a href="/admin/users.html" data-page="users">👥 Users</a>
-      <a href="/admin/produce.html" data-page="produce">🌾 Produce</a>
-      <a href="/admin/categories.html" data-page="categories">📁 Categories</a>
-      <a href="/admin/market-prices.html" data-page="market-prices">📈 Market Prices</a>
-      <a href="/admin/enquiries.html" data-page="enquiries">✉️ Enquiries</a>
-      <a href="/admin/messages.html" data-page="messages">💬 Messages</a>
+      <a href="/admin/dashboard.html">📊 Dashboard</a>
+      <a href="/admin/users.html" class="active">👥 Users</a>
+      <a href="/admin/produce.html">🌾 Produce</a>
+      <a href="/admin/categories.html">📁 Categories</a>
+      <a href="/admin/market-prices.html">📈 Market Prices</a>
+      <a href="/admin/enquiries.html">✉️ Enquiries</a>
+      <a href="/admin/messages.html">💬 Messages</a>
+      <a href="/admin/reviews.html">⭐ Reviews</a>
       <a href="/" style="margin-top:auto">← Back to Site</a>
       <a href="#" id="adminLogout">Logout</a>
     </nav>
   </aside>
+
   <main class="admin-content">
-    <h1 style="color:var(--forest);margin-bottom:1.5rem">Users</h1>
-    <div id="adminRoot"><p class="text-muted">Loading...</p></div>
+    <div class="flex justify-between items-center" style="margin-bottom:1.25rem;flex-wrap:wrap;gap:1rem">
+      <h1 style="color:var(--forest);font-size:1.6rem;margin:0">Users</h1>
+      <button class="btn btn-secondary btn-sm" id="refreshBtn">↻ Refresh</button>
+    </div>
+
+    <div class="user-stats" id="userStats"></div>
+
+    <div class="user-toolbar">
+      <input type="text" id="searchInput" placeholder="Search by name or email...">
+      <select id="roleFilter">
+        <option value="">All roles</option>
+        <option value="farmer">Farmers</option>
+        <option value="buyer">Buyers</option>
+        <option value="admin">Admins</option>
+      </select>
+      <select id="statusFilter">
+        <option value="">All statuses</option>
+        <option value="active">Active</option>
+        <option value="suspended">Suspended</option>
+        <option value="pending">Pending</option>
+      </select>
+      <select id="verifiedFilter">
+        <option value="">All verification</option>
+        <option value="true">Verified only</option>
+        <option value="false">Unverified only</option>
+      </select>
+    </div>
+
+    <div id="usersRoot"><p class="text-muted">Loading users…</p></div>
   </main>
 </div>
+
+<!-- User detail modal -->
+<div class="modal-overlay" id="userModal" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1500;display:none;place-items:center;padding:1rem;backdrop-filter:blur(4px)">
+  <div class="modal" style="background:#fff;border-radius:14px;box-shadow:var(--shadow-lg);max-width:560px;width:100%;max-height:90vh;overflow-y:auto;animation:modalIn .25s ease">
+    <div class="modal-body" style="padding:1.75rem" id="userModalBody"></div>
+  </div>
+</div>
+
 <script src="/js/api.js"></script>
 <script src="/js/components.js"></script>
-<script src="/js/admin.js"></script>
-</body></html>
+<script>
+if (!requireAuth('admin')) throw new Error('auth');
+document.getElementById('adminLogout').onclick = (e) => { e.preventDefault(); clearSession(); location.href = '/admin/login.html'; };
 
+let allUsers = [];
+let filteredUsers = [];
+let currentFilters = { search: '', role: '', status: '', verified: '' };
+const currentAdminId = API.userId();
+
+function initialsOf(name) {
+  return (name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+}
+
+function escapeHtmlLocal(str) {
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+async function loadUsers() {
+  document.getElementById('usersRoot').innerHTML = '<p class="text-muted">Loading users…</p>';
+  try {
+    const r = await API.get('/admin/users');
+    allUsers = r.data || [];
+    updateStats();
+    applyFilters();
+  } catch (e) {
+    document.getElementById('usersRoot').innerHTML = `<p style="color:var(--danger)">${escapeHtmlLocal(e.message)}</p>`;
+  }
+}
+
+function updateStats() {
+  const total = allUsers.length;
+  const farmers = allUsers.filter(u => u.role === 'farmer').length;
+  const buyers = allUsers.filter(u => u.role === 'buyer').length;
+  const verified = allUsers.filter(u => u.verified).length;
+  const suspended = allUsers.filter(u => u.accountStatus === 'suspended').length;
+
+  document.getElementById('userStats').innerHTML = `
+    <div class="user-stat"><div class="lbl">Total Users</div><div class="val">${total}</div></div>
+    <div class="user-stat"><div class="lbl">Farmers</div><div class="val">${farmers}</div></div>
+    <div class="user-stat"><div class="lbl">Buyers</div><div class="val">${buyers}</div></div>
+    <div class="user-stat"><div class="lbl">Verified</div><div class="val" style="color:var(--green)">${verified}</div></div>
+    <div class="user-stat"><div class="lbl">Suspended</div><div class="val" style="color:var(--danger)">${suspended}</div></div>
+  `;
+}
+
+function applyFilters() {
+  const { search, role, status, verified } = currentFilters;
+  filteredUsers = allUsers.filter(u => {
+    if (role && u.role !== role) return false;
+    if (status && u.accountStatus !== status) return false;
+    if (verified === 'true' && !u.verified) return false;
+    if (verified === 'false' && u.verified) return false;
+    if (search) {
+      const s = search.toLowerCase();
+      const hay = [u.name, u.email, u.location, u.state].filter(Boolean).join(' ').toLowerCase();
+      if (!hay.includes(s)) return false;
+    }
+    return true;
+  });
+  renderTable();
+}
+
+function renderTable() {
+  const root = document.getElementById('usersRoot');
+  if (!filteredUsers.length) {
+    root.innerHTML = `<div class="empty-state"><div class="emoji">👥</div><h3>No users match your filters</h3><p class="text-muted mt-1">Try clearing filters or adjusting your search.</p></div>`;
+    return;
+  }
+
+  const rows = filteredUsers.map(u => {
+    const isAdmin = u.role === 'admin';
+    const isSelf = u._id === currentAdminId;
+    const initials = initialsOf(u.name);
+    const roleCls = u.role === 'farmer' ? 'role-farmer' : u.role === 'buyer' ? 'role-buyer' : 'role-admin';
+    const statusBadge = u.accountStatus === 'active'
+      ? '<span class="badge badge-green">active</span>'
+      : u.accountStatus === 'suspended'
+        ? '<span class="badge badge-red">suspended</span>'
+        : '<span class="badge badge-gray">pending</span>';
+
+    return `
+      <tr data-id="${u._id}">
+        <td data-label="User">
+          <div style="display:flex;align-items:center;gap:.65rem">
+            <div class="user-avatar">${initials}</div>
+            <div>
+              <strong>${escapeHtmlLocal(u.name)}</strong>${u.verified ? ' <span style="color:var(--green)">✅</span>' : ''}
+              <div style="font-size:.78rem;color:var(--muted)">${escapeHtmlLocal(u.email)}</div>
+            </div>
+          </div>
+        </td>
+        <td data-label="Role"><span class="role-badge ${roleCls}">${escapeHtmlLocal(u.role)}</span></td>
+        <td data-label="Location"><small>${escapeHtmlLocal(u.location || '—')}${u.state ? ', ' + escapeHtmlLocal(u.state) : ''}</small></td>
+        <td data-label="Status">${statusBadge}</td>
+        <td data-label="Verified">${u.verified ? '<span style="color:var(--green);font-weight:700">Yes</span>' : '<span class="text-muted">No</span>'}</td>
+        <td data-label="Joined"><small class="text-muted">${fmtDate(u.createdAt)}</small></td>
+        <td data-label="Actions">
+          <div class="row-actions">
+            <button class="btn btn-secondary btn-sm" data-action="view" data-id="${u._id}">View</button>
+            ${!u.verified ? `<button class="btn btn-primary btn-sm" data-action="verify" data-id="${u._id}">Verify</button>` : ''}
+            ${u.verified && !isAdmin ? `<button class="btn btn-secondary btn-sm" data-action="unverify" data-id="${u._id}">Unverify</button>` : ''}
+            ${!isAdmin && !isSelf ? `<button class="btn btn-secondary btn-sm" data-action="toggle-status" data-id="${u._id}">${u.accountStatus === 'active' ? 'Suspend' : 'Activate'}</button>` : ''}
+            ${!isAdmin && !isSelf ? `<button class="btn btn-danger btn-sm" data-action="delete" data-id="${u._id}">Delete</button>` : ''}
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
+
+  root.innerHTML = `
+    <div class="table-wrap">
+      <table class="user-table">
+        <thead><tr>
+          <th>User</th><th>Role</th><th>Location</th><th>Status</th><th>Verified</th><th>Joined</th><th>Actions</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+
+  root.querySelectorAll('[data-action]').forEach(b => {
+    b.onclick = () => handleAction(b.dataset.action, b.dataset.id);
+  });
+}
+
+async function handleAction(action, id) {
+  const u = allUsers.find(x => x._id === id);
+  if (!u) return;
+
+  if (action === 'view') { openUserModal(u); return; }
+
+  if (action === 'verify') {
+    try {
+      await API.patch('/admin/users/' + id + '/verify');
+      u.verified = true;
+      toast(`${u.name} verified`);
+      updateStats(); applyFilters();
+    } catch (e) { toast(e.message, 'error'); }
+  }
+
+  if (action === 'unverify') {
+    if (!confirm(`Remove verification from ${u.name}? Their ✅ badge will disappear across the platform.`)) return;
+    try {
+      await API.patch('/admin/users/' + id + '/unverify');
+      u.verified = false;
+      toast(`${u.name} unverified`);
+      updateStats(); applyFilters();
+    } catch (e) { toast(e.message, 'error'); }
+  }
+
+  if (action === 'toggle-status') {
+    const verb = u.accountStatus === 'active' ? 'Suspend' : 'Activate';
+    if (!confirm(`${verb} ${u.name}?`)) return;
+    try {
+      const r = await API.patch('/admin/users/' + id + '/toggle-status');
+      u.accountStatus = r.data.accountStatus;
+      toast(`${u.name} is now ${r.data.accountStatus}`);
+      updateStats(); applyFilters();
+    } catch (e) { toast(e.message, 'error'); }
+  }
+
+  if (action === 'delete') {
+    const confirmed = confirm(
+      `DELETE ${u.name} permanently?\n\n` +
+      `This will remove:\n` +
+      `• The user account\n` +
+      `• All their produce listings\n` +
+      `• All their enquiries\n` +
+      `• All their reviews and favorites\n` +
+      `• Their farmer profile and notifications\n\n` +
+      `This cannot be undone.`
+    );
+    if (!confirmed) return;
+    try {
+      const r = await API.delete('/admin/users/' + id);
+      toast(`Deleted ${u.name} — ${r.data.produceRemoved} listings, ${r.data.enquiriesRemoved} enquiries removed`);
+      allUsers = allUsers.filter(x => x._id !== id);
+      updateStats(); applyFilters();
+    } catch (e) { toast(e.message, 'error'); }
+  }
+}
+
+function openUserModal(u) {
+  const initials = initialsOf(u.name);
+  const roleCls = u.role === 'farmer' ? 'role-farmer' : u.role === 'buyer' ? 'role-buyer' : 'role-admin';
+  document.getElementById('userModalBody').innerHTML = `
+    <div class="flex justify-between items-center mb-3">
+      <h3 style="margin:0">${escapeHtmlLocal(u.name)}</h3>
+      <button class="btn btn-secondary btn-sm" onclick="closeUserModal()">×</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem">
+      <div class="user-avatar" style="width:56px;height:56px;font-size:1.1rem">${initials}</div>
+      <div>
+        <strong style="font-size:1.05rem">${escapeHtmlLocal(u.email)}</strong>
+        <div style="margin-top:.3rem"><span class="role-badge ${roleCls}">${escapeHtmlLocal(u.role)}</span> ${u.verified ? ' ✅ Verified' : ''}</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;font-size:.88rem;margin-bottom:1rem">
+      <div><span class="text-muted">Phone:</span> <strong>${escapeHtmlLocal(u.phone || '—')}</strong></div>
+      <div><span class="text-muted">State:</span> <strong>${escapeHtmlLocal(u.state || '—')}</strong></div>
+      <div><span class="text-muted">Location:</span> <strong>${escapeHtmlLocal(u.location || '—')}</strong></div>
+      <div><span class="text-muted">Status:</span> <strong>${escapeHtmlLocal(u.accountStatus)}</strong></div>
+      <div><span class="text-muted">Joined:</span> <strong>${fmtDate(u.createdAt)}</strong></div>
+      <div><span class="text-muted">Last Login:</span> <strong>${u.lastLogin ? fmtDate(u.lastLogin) : '—'}</strong></div>
+    </div>
+    ${u.bio ? `<div style="background:var(--beige);padding:.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-size:.88rem;color:var(--ink)"><strong>Bio:</strong> ${escapeHtmlLocal(u.bio)}</div>` : ''}
+    <div class="flex gap-1" style="flex-wrap:wrap;padding-top:1rem;border-top:1px solid var(--border)">
+      ${!u.verified ? `<button class="btn btn-primary btn-sm" onclick="modalAction('verify','${u._id}')">✅ Verify</button>` : ''}
+      ${u.verified && u.role !== 'admin' ? `<button class="btn btn-secondary btn-sm" onclick="modalAction('unverify','${u._id}')">Unverify</button>` : ''}
+      ${u.role !== 'admin' && u._id !== currentAdminId ? `<button class="btn btn-secondary btn-sm" onclick="modalAction('toggle-status','${u._id}')">${u.accountStatus === 'active' ? 'Suspend' : 'Activate'}</button>` : ''}
+      ${u.role !== 'admin' && u._id !== currentAdminId ? `<button class="btn btn-danger btn-sm" onclick="modalAction('delete','${u._id}')">Delete user</button>` : ''}
+    </div>
+  `;
+  document.getElementById('userModal').style.display = 'grid';
+}
+
+function closeUserModal() {
+  document.getElementById('userModal').style.display = 'none';
+}
+
+async function modalAction(action, id) {
+  closeUserModal();
+  await handleAction(action, id);
+}
+
+document.getElementById('userModal').addEventListener('click', (e) => {
+  if (e.target.id === 'userModal') closeUserModal();
+});
+
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  currentFilters.search = e.target.value; applyFilters();
+});
+document.getElementById('roleFilter').addEventListener('change', (e) => {
+  currentFilters.role = e.target.value; applyFilters();
+});
+document.getElementById('statusFilter').addEventListener('change', (e) => {
+  currentFilters.status = e.target.value; applyFilters();
+});
+document.getElementById('verifiedFilter').addEventListener('change', (e) => {
+  currentFilters.verified = e.target.value; applyFilters();
+});
+document.getElementById('refreshBtn').onclick = loadUsers;
+
+loadUsers();
+</script>
+</body></html>

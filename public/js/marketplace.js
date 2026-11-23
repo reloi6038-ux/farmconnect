@@ -147,6 +147,7 @@ function renderCard(p) {
         <div class="price">${fmtNaira(p.price)}<span style="font-size:.8rem;color:var(--muted);font-weight:500"> /${escapeHtml(p.unit)}</span></div>
         <div class="meta">${p.quantity} ${escapeHtml(p.unit)} available</div>
         <div class="meta">📍 ${escapeHtml(p.location)}, ${escapeHtml(p.state)}</div>
+        ${p.reviewCount > 0 ? `<div class="farmer-line"><span class="stars">${Array.from({length:5}, (_,i) => `<span class="${i < Math.round(p.rating) ? 'filled' : ''}">★</span>`).join('')}</span> <span style="font-size:.8rem;color:var(--muted);margin-left:.25rem">${p.rating} (${p.reviewCount})</span></div>` : ''}
         <div class="farmer-line">👨‍🌾 ${escapeHtml(p.farmer && p.farmer.name || 'Farmer')} ${p.farmer && p.farmer.verified ? '✅' : ''}</div>
         <a href="/produce-details.html?id=${p._id}" class="btn btn-primary btn-sm btn-block" style="margin-top:.5rem">View Details</a>
       </div>
@@ -282,3 +283,4 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Mobile toggle
   $('mobileFilterToggle').onclick = () => $('filterPanel').classList.toggle('open');
 });
+

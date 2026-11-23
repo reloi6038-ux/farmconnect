@@ -71,4 +71,18 @@ const stats = async (req, res, next) => {
   }
 };
 
-module.exports = { getProfile, getMyProfile, updateProfile, listFarmers, stats };
+const getMyRating = async (req, res, next) => {
+  try {
+    const Review = require('../models/Review');
+    const agg = await Review.aggregate([
+      { $match: { farmer: req.user._id, status: 'approved', produce: { $ne: null } } },
+      { $group: { _id: null, avg: { $avg: '$rating' }, count: { $sum: 1 } } }
+    ]);
+    const average = agg[0] ? Math.round(agg[0].avg * 10) / 10 : 0;
+    const count = agg[0] ? agg[0].count : 0;
+    res.json({ success: true, average, count });
+  } catch (e) { next(e); }
+};
+
+module.exports = { getProfile, getMyProfile, updateProfile, listFarmers, stats, getMyRating };
+

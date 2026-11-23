@@ -27,6 +27,12 @@ async function loadFarmerDashboard() {
     animateNumber(document.getElementById('statEnq'), enq.data.length);
     animateNumber(document.getElementById('statViews'), stats.data.totalViews);
     animateNumber(document.getElementById('statFavs'), stats.data.totalFavorites);
+    try {
+      const reviewAgg = await API.get('/farmers/me/rating');
+      const el = document.getElementById('statRating');
+      if (reviewAgg.average > 0) el.innerHTML = `${reviewAgg.average} <span style="font-size:.9rem;color:var(--muted)">(${reviewAgg.count})</span>`;
+      else el.textContent = '—';
+    } catch (_) {}
 
     const tb = document.getElementById('listingsTbody');
     if (!mine.data.length) { tb.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No listings yet. <a href="/add-produce.html">Add your first produce</a></td></tr>'; }
@@ -101,4 +107,5 @@ document.addEventListener('DOMContentLoaded', () => {
   if (path.includes('farmer-dashboard')) loadFarmerDashboard();
   else if (path.includes('buyer-dashboard')) loadBuyerDashboard();
 });
+
 
