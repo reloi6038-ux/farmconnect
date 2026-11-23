@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html lang="en"><head>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#14532d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FarmConnect">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buyer Dashboard — FarmConnect</title>
+<link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/responsive.css">
+<link rel="stylesheet" href="/css/dashboard.css"><link rel="stylesheet" href="/css/animations.css">
+</head><body>
+<nav class="navbar" id="navbar"></nav>
+
+<div class="sidebar-layout">
+  <aside class="sidebar">
+    <nav>
+      <a href="/buyer-dashboard.html" class="active">📊 Dashboard</a>
+      <a href="/marketplace.html">🛒 Marketplace</a>
+      <a href="/favorites.html">♥ Saved</a>
+      <a href="/enquiries.html">✉️ Enquiries</a>
+      <a href="/notifications.html">🔔 Notifications</a>
+      <a href="/profile.html">👤 Profile</a>
+    </nav>
+  </aside>
+  <main>
+    <div class="dashboard-header">
+      <h1>Welcome, <span id="userName">Buyer</span></h1>
+      <div class="dashboard-actions">
+        <a href="/marketplace.html" class="btn btn-primary">Browse Marketplace</a>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="dash-card"><div class="dash-icon">♥</div><div class="dash-label">Saved Produce</div><div class="dash-value" id="statFavs">—</div></div>
+      <div class="dash-card"><div class="dash-icon">✉️</div><div class="dash-label">Enquiries</div><div class="dash-value" id="statEnq">—</div></div>
+      <div class="dash-card"><div class="dash-icon">⏳</div><div class="dash-label">Pending</div><div class="dash-value" id="statPending">—</div></div>
+      <div class="dash-card"><div class="dash-icon">💬</div><div class="dash-label">Responded</div><div class="dash-value" id="statResponded">—</div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><h3>Recent Enquiries</h3><a href="/enquiries.html" class="btn btn-secondary btn-sm">View All</a></div>
+      <div class="panel-body" style="padding:0">
+        <div class="table-wrap" style="box-shadow:none;border:none;border-radius:0">
+          <table><thead><tr><th>Produce</th><th>Farmer</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody id="enqTbody"><tr><td colspan="4" class="text-center text-muted">Loading...</td></tr></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><h3>Saved Produce</h3><a href="/favorites.html" class="btn btn-secondary btn-sm">View All</a></div>
+      <div class="panel-body"><div id="favGrid" class="product-grid"></div></div>
+    </div>
+  </main>
+</div>
+
+<footer id="footer"></footer>
+<script src="/js/api.js"></script><script src="/js/components.js"></script><script src="/js/dashboard.js"></script>
+</body></html>
+

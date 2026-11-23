@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html>
+<html lang="en"><head>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#14532d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FarmConnect">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notifications — FarmConnect</title>
+<link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/responsive.css">
+</head><body>
+<nav class="navbar" id="navbar"></nav>
+<section class="section"><div class="container" style="max-width:800px">
+  <div class="flex justify-between items-center mb-3">
+    <h2 class="section-title" style="margin:0">Notifications</h2>
+    <button class="btn btn-secondary btn-sm" id="readAllBtn">Mark all read</button>
+  </div>
+  <div id="notifList" class="mt-3"></div>
+</div></section>
+<footer id="footer"></footer>
+<script src="/js/api.js"></script><script src="/js/components.js"></script>
+<script>
+if (requireAuth()) {
+  async function load() {
+    try {
+      const r = await API.get('/notifications');
+      const list = document.getElementById('notifList');
+      if (!r.data.length) { list.innerHTML = '<div class="empty-state"><div class="emoji">🔔</div><p>No notifications yet.</p></div>'; return; }
+      list.innerHTML = r.data.map(n => `
+        <div class="card mb-2" style="${n.read ? '' : 'border-left:4px solid var(--green)'}">
+          <div class="card-body">
+            <div class="flex justify-between items-center flex-wrap gap-1">
+              <strong>${escapeHtml(n.title)}</strong>
+              ${n.read ? '' : '<span class="badge badge-gold">New</span>'}
+            </div>
+            <p class="text-muted mt-1" style="font-size:.92rem">${escapeHtml(n.message)}</p>
+            <div class="flex justify-between items-center mt-2">
+              <small class="text-muted">${fmtRelative(n.createdAt)}</small>
+              <div class="flex gap-1">
+                ${n.read ? '' : `<button class="btn btn-secondary btn-sm" data-mark="${n._id}">Mark read</button>`}
+                <button class="btn btn-danger btn-sm" data-del="${n._id}">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>`).join('');
+      list.querySelectorAll('[data-mark]').forEach(b => {
+        b.onclick = async () => { await API.patch('/notifications/' + b.dataset.mark + '/read'); load(); };
+      });
+      list.querySelectorAll('[data-del]').forEach(b => {
+        b.onclick = async () => { await API.delete('/notifications/' + b.dataset.del); load(); };
+      });
+    } catch (e) { toast(e.message, 'error'); }
+  }
+  document.getElementById('readAllBtn').onclick = async () => { await API.patch('/notifications/read-all'); load(); };
+  load();
+}
+</script>
+</body></html>
+

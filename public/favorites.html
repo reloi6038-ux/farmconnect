@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html lang="en"><head>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#14532d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FarmConnect">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Favorites — FarmConnect</title>
+<link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/responsive.css">
+</head><body>
+<nav class="navbar" id="navbar"></nav>
+<section class="section"><div class="container">
+  <h2 class="section-title">Saved Produce</h2>
+  <div id="favGrid" class="product-grid mt-3"></div>
+</div></section>
+<footer id="footer"></footer>
+<script src="/js/api.js"></script><script src="/js/components.js"></script>
+<script>
+if (requireAuth('buyer')) {
+  API.get('/favorites').then(r => {
+    const grid = document.getElementById('favGrid');
+    const items = r.data.filter(f => f.produce);
+    if (!items.length) { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="emoji">♡</div><h3>No saved produce yet</h3><p class="text-muted mt-1">Browse the marketplace and tap the save button on any listing.</p><a href="/marketplace.html" class="btn btn-primary mt-3">Browse Marketplace</a></div>'; }
+    else {
+      grid.innerHTML = items.map(f => `
+        <div class="product-card">
+          <div class="product-img">🌿</div>
+          <div class="card-body">
+            <h3>${escapeHtml(f.produce.productName)}</h3>
+            <div class="price">${fmtNaira(f.produce.price)}/${escapeHtml(f.produce.unit)}</div>
+            <div class="meta">${escapeHtml(f.produce.location)}, ${escapeHtml(f.produce.state)}</div>
+            <div class="flex gap-1 mt-1">
+              <a href="/produce-details.html?id=${f.produce._id}" class="btn btn-primary btn-sm" style="flex:1">View</a>
+              <button class="btn btn-danger btn-sm" data-remove="${f.produce._id}">Remove</button>
+            </div>
+          </div>
+        </div>`).join('');
+      grid.querySelectorAll('[data-remove]').forEach(b => {
+        b.onclick = async () => {
+          try { await API.delete('/favorites/' + b.dataset.remove); toast('Removed'); b.closest('.product-card').remove(); }
+          catch (e) { toast(e.message, 'error'); }
+        };
+      });
+    }
+  }).catch(e => toast(e.message, 'error'));
+}
+</script>
+</body></html>
+

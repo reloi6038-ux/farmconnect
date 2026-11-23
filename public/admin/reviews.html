@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Reviews — FarmConnect</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<link rel="stylesheet" href="/css/admin.css">
+</head><body>
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="brand"><img src="/favicon.svg" alt="" width="32" height="32" style="border-radius:8px"><span style="margin-left:.5rem">Admin</span></div>
+    <nav>
+      <a href="/admin/dashboard.html">📊 Dashboard</a>
+      <a href="/admin/users.html">👥 Users</a>
+      <a href="/admin/produce.html">🌾 Produce</a>
+      <a href="/admin/categories.html">📁 Categories</a>
+      <a href="/admin/market-prices.html">📈 Market Prices</a>
+      <a href="/admin/enquiries.html">✉️ Enquiries</a>
+      <a href="/admin/messages.html">💬 Messages</a>
+      <a href="/admin/reviews.html" class="active">⭐ Reviews</a>
+      <a href="/" style="margin-top:auto">← Back to Site</a>
+      <a href="#" id="adminLogout">Logout</a>
+    </nav>
+  </aside>
+  <main class="admin-content">
+    <h1 style="color:var(--forest);margin-bottom:1.5rem">Reviews Moderation</h1>
+    <div id="adminRoot">Loading…</div>
+  </main>
+</div>
+<script src="/js/api.js"></script>
+<script src="/js/components.js"></script>
+<script>
+if (!requireAuth('admin')) throw new Error('auth');
+document.getElementById('adminLogout').onclick = (e) => { e.preventDefault(); clearSession(); location.href = '/admin/login.html'; };
+
+async function load() {
+  const root = document.getElementById('adminRoot');
+  try {
+    const r = await API.get('/reviews?status=all&limit=50');
+    if (!r.data.length) { root.innerHTML = '<div class="empty-state"><div class="emoji">⭐</div><p>No reviews yet.</p></div>'; return; }
+    root.innerHTML = `
+      <div class="table-wrap"><table><thead><tr>
+        <th>Reviewer</th><th>Rating</th><th>Title</th><th>Status</th><th>Date</th><th>Actions</th>
+      </tr></thead><tbody>
+      ${r.data.map(rv => `
+        <tr>
+          <td><strong>${escapeHtml(rv.name)}</strong><br><small class="text-muted">${escapeHtml(rv.role)} · ${escapeHtml(rv.location || '—')}</small></td>
+          <td>${'★'.repeat(rv.rating)}${'☆'.repeat(5 - rv.rating)}</td>
+          <td>${escapeHtml(rv.title)}</td>
+          <td><span class="badge ${rv.status === 'approved' ? 'badge-green' : rv.status === 'pending' ? 'badge-gold' : 'badge-red'}">${escapeHtml(rv.status)}</span></td>
+          <td class="text-muted" style="font-size:.85rem">${fmtRelative(rv.createdAt)}</td>
+          <td>
+            ${rv.status !== 'approved' ? `<button class="btn btn-primary btn-sm" data-approve="${rv._id}">Approve</button>` : ''}
+            ${rv.status !== 'rejected' ? `<button class="btn btn-secondary btn-sm" data-reject="${rv._id}">Reject</button>` : ''}
+            <button class="btn btn-danger btn-sm" data-del="${rv._id}">Delete</button>
+          </td>
+        </tr>`).join('')}
+      </tbody></table></div>`;
+
+    root.querySelectorAll('[data-approve]').forEach(b => b.onclick = async () => { await API.patch('/reviews/' + b.dataset.approve + '/moderate', { status: 'approved' }); load(); });
+    root.querySelectorAll('[data-reject]').forEach(b => b.onclick = async () => { await API.patch('/reviews/' + b.dataset.reject + '/moderate', { status: 'rejected' }); load(); });
+    root.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
+      if (!confirm('Delete this review permanently?')) return;
+      await API.delete('/reviews/' + b.dataset.del);
+      load();
+    });
+  } catch (e) {
+    root.innerHTML = `<p style="color:var(--danger)">${escapeHtml(e.message)}</p>`;
+  }
+}
+load();
+</script>
+</body></html>

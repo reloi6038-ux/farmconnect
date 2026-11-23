@@ -1,0 +1,291 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" role="img" aria-label="A seed growing into a healthy green plant">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ecfdf5"/>
+      <stop offset=".6" stop-color="#f7fef9"/>
+      <stop offset="1" stop-color="#fefce8"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#fef3c7" stop-opacity=".85"/>
+      <stop offset=".55" stop-color="#fde68a" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#fde68a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="ambient" cx="50%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".6"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="soilTop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7c4a23"/>
+      <stop offset="1" stop-color="#5a3418"/>
+    </linearGradient>
+    <linearGradient id="soilDeep" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a2c15"/>
+      <stop offset="1" stop-color="#2e1a0c"/>
+    </linearGradient>
+    <radialGradient id="soilHumus" cx="50%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#6b4022" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#6b4022" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="seedGrad" cx="45%" cy="35%" r="65%">
+      <stop offset="0" stop-color="#fde68a"/>
+      <stop offset=".6" stop-color="#d97706"/>
+      <stop offset="1" stop-color="#92400e"/>
+    </radialGradient>
+    <linearGradient id="rootGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c8a86b"/>
+      <stop offset="1" stop-color="#8a6a3b"/>
+    </linearGradient>
+    <linearGradient id="stemGrad" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#14532d"/>
+      <stop offset=".55" stop-color="#166534"/>
+      <stop offset="1" stop-color="#22c55e"/>
+    </linearGradient>
+    <linearGradient id="leafA" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#16a34a"/>
+      <stop offset=".55" stop-color="#22c55e"/>
+      <stop offset="1" stop-color="#4ade80"/>
+    </linearGradient>
+    <linearGradient id="leafB" x1="1" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#15803d"/>
+      <stop offset=".6" stop-color="#22c55e"/>
+      <stop offset="1" stop-color="#86efac"/>
+    </linearGradient>
+    <linearGradient id="leafC" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#65a30d"/>
+      <stop offset="1" stop-color="#22c55e"/>
+    </linearGradient>
+    <radialGradient id="flowerCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#fef9c3"/>
+      <stop offset=".6" stop-color="#facc15"/>
+      <stop offset="1" stop-color="#ca8a04"/>
+    </radialGradient>
+    <radialGradient id="drop" cx="35%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#e0f2fe"/>
+      <stop offset=".7" stop-color="#38bdf8"/>
+      <stop offset="1" stop-color="#0284c7"/>
+    </radialGradient>
+    <clipPath id="aboveGround">
+      <rect x="0" y="0" width="500" height="330"/>
+    </clipPath>
+    <clipPath id="belowGround">
+      <rect x="0" y="330" width="500" height="170"/>
+    </clipPath>
+  </defs>
+
+  <style>
+    /* --- Initial States --- */
+    .seed { opacity: 1; }
+    .root { stroke-dasharray: 260; stroke-dashoffset: 260; opacity: 0; }
+    .stem { stroke-dasharray: 340; stroke-dashoffset: 340; opacity: 0; }
+    .branch { stroke-dasharray: 180; stroke-dashoffset: 180; opacity: 0; }
+    .leaf { opacity: 0; transform: scale(.04) rotate(-15deg); transform-origin: center bottom; transform-box: fill-box; }
+    .flower { opacity: 0; transform: scale(.1); transform-origin: center; transform-box: fill-box; }
+    .sun-rays { opacity: 0; }
+    .particle { opacity: 0; }
+    .droplet { opacity: 0; }
+    .sparkle { opacity: 0; }
+    .plant { transform-origin: center bottom; transform-box: fill-box; }
+
+    /* --- Animations (auto-run on load) --- */
+    .seed         { animation: seedWake 2s cubic-bezier(.4,0,.2,1) .2s forwards, seedDissolve 1.4s ease-in 2.2s forwards; }
+    .root         { animation: rootGrow 2s ease-out forwards; }
+    .root-1       { animation-delay: 2.2s; }
+    .root-2       { animation-delay: 2.5s; }
+    .root-3       { animation-delay: 2.8s; }
+    .root-4       { animation-delay: 3.1s; }
+    .root-5       { animation-delay: 3.4s; }
+    .stem         { animation: stemGrow 2s cubic-bezier(.4,0,.2,1) 3.4s forwards; }
+    .leaf-1       { animation: leafOpen 1s cubic-bezier(.34,1.56,.64,1) 5.0s forwards; }
+    .leaf-2       { animation: leafOpen 1s cubic-bezier(.34,1.56,.64,1) 5.2s forwards; }
+    .branch-1     { animation: branchGrow 1.2s ease-out 5.8s forwards; }
+    .branch-2     { animation: branchGrow 1.2s ease-out 6.2s forwards; }
+    .leaf-3       { animation: leafOpen 1s cubic-bezier(.34,1.56,.64,1) 6.0s forwards; }
+    .leaf-4       { animation: leafOpen 1s cubic-bezier(.34,1.56,.64,1) 6.3s forwards; }
+    .leaf-5       { animation: leafOpen 1s cubic-bezier(.34,1.56,.64,1) 6.6s forwards; }
+    .leaf-6       { animation: leafOpen 1s cubic-bezier(.34,1.56,.64,1) 6.9s forwards; }
+    .leaf-7       { animation: leafOpen 1s cubic-bezier(.34,1.56,.64,1) 7.1s forwards; }
+    .leaf-8       { animation: leafOpen 1s cubic-bezier(.34,1.56,.64,1) 7.4s forwards; }
+    .flower-1     { animation: flowerPop 1s cubic-bezier(.34,1.56,.64,1) 7.7s forwards; }
+    .flower-2     { animation: flowerPop 1s cubic-bezier(.34,1.56,.64,1) 8.0s forwards; }
+    .sun-rays     { animation: raysIn 3s ease-out .4s forwards, raysDrift 14s ease-in-out 3.4s infinite; }
+    .particle     { animation: particleFloat 8s ease-in-out infinite; }
+    .droplet      { animation: dropletFall 1.8s ease-in 2.6s forwards; }
+    .sparkle      { animation: sparkleTwinkle 3s ease-in-out infinite; }
+    .plant        { animation: plantSway 6s ease-in-out 8.5s infinite; }
+
+    /* --- Keyframes --- */
+    @keyframes seedWake {
+      0%   { opacity: 1; transform: scale(.9) rotate(0deg); }
+      40%  { opacity: 1; transform: scale(1.08) rotate(-5deg); }
+      70%  { opacity: 1; transform: scale(1.03) rotate(3deg); }
+      100% { opacity: 1; transform: scale(1.06) rotate(0deg); }
+    }
+    @keyframes seedDissolve {
+      0%   { opacity: 1; transform: scale(1.06); }
+      100% { opacity: 0; transform: scale(.4); }
+    }
+    @keyframes rootGrow {
+      0%   { stroke-dashoffset: 260; opacity: 0; }
+      15%  { opacity: 1; }
+      100% { stroke-dashoffset: 0; opacity: 1; }
+    }
+    @keyframes stemGrow {
+      0%   { stroke-dashoffset: 340; opacity: 0; }
+      8%   { opacity: 1; }
+      100% { stroke-dashoffset: 0; opacity: 1; }
+    }
+    @keyframes branchGrow {
+      0%   { stroke-dashoffset: 180; opacity: 0; }
+      15%  { opacity: 1; }
+      100% { stroke-dashoffset: 0; opacity: 1; }
+    }
+    @keyframes leafOpen {
+      0%   { opacity: 0; transform: scale(.04) rotate(-15deg); }
+      60%  { opacity: 1; transform: scale(1.12) rotate(5deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0); }
+    }
+    @keyframes flowerPop {
+      0%   { opacity: 0; transform: scale(.1); }
+      65%  { opacity: 1; transform: scale(1.15); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    @keyframes raysIn {
+      0%   { opacity: 0; }
+      100% { opacity: .65; }
+    }
+    @keyframes raysDrift {
+      0%, 100% { transform: translateX(0) rotate(0deg); opacity: .55; }
+      50%      { transform: translateX(8px) rotate(2deg); opacity: .75; }
+    }
+    @keyframes particleFloat {
+      0%   { opacity: 0; transform: translate(0, 0); }
+      20%  { opacity: .55; }
+      80%  { opacity: .55; }
+      100% { opacity: 0; transform: translate(var(--dx, 40px), -80px); }
+    }
+    @keyframes dropletFall {
+      0%   { opacity: 0; transform: translateY(-20px) scale(.6); }
+      20%  { opacity: 1; transform: translateY(0) scale(1); }
+      80%  { opacity: 1; transform: translateY(240px) scale(1); }
+      100% { opacity: 0; transform: translateY(280px) scale(.7); }
+    }
+    @keyframes sparkleTwinkle {
+      0%, 100% { opacity: 0; transform: scale(.6); }
+      50%      { opacity: .9; transform: scale(1); }
+    }
+    @keyframes plantSway {
+      0%, 100% { transform: rotate(-1.6deg) translateX(-2px); }
+      50%      { transform: rotate(1.6deg) translateX(2px); }
+    }
+
+    /* Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; }
+      .seed { opacity: 0; }
+      .root, .stem, .branch { stroke-dashoffset: 0; opacity: 1; }
+      .leaf, .flower { opacity: 1; transform: none; }
+      .sun-rays { opacity: .55; }
+      .particle, .droplet, .sparkle { opacity: 0; }
+      .plant { transform: none; }
+    }
+  </style>
+
+  <rect width="500" height="500" fill="url(#sky)"/>
+  <ellipse cx="380" cy="90" rx="220" ry="160" fill="url(#sunGlow)"/>
+  <rect width="500" height="500" fill="url(#ambient)"/>
+
+  <g class="sun-rays" stroke="#fde68a" stroke-width="10" stroke-linecap="round" opacity=".55">
+    <line x1="380" y1="0"  x2="200" y2="320"/>
+    <line x1="410" y1="0"  x2="260" y2="320"/>
+    <line x1="440" y1="0"  x2="330" y2="320"/>
+    <line x1="470" y1="0"  x2="410" y2="320"/>
+  </g>
+
+  <path d="M0 330 Q70 320 140 328 Q210 336 280 324 Q350 314 420 326 Q460 334 500 326 L500 500 L0 500 Z" fill="url(#soilTop)"/>
+  <path d="M0 360 Q100 355 200 362 Q300 370 400 360 Q450 356 500 362 L500 500 L0 500 Z" fill="url(#soilDeep)" opacity=".85"/>
+  <ellipse cx="250" cy="400" rx="220" ry="60" fill="url(#soilHumus)"/>
+
+  <g fill="#2e1a0c" opacity=".35">
+    <circle cx="40"  cy="345" r="1.6"/>
+    <circle cx="90"  cy="360" r="2"/>
+    <circle cx="155" cy="340" r="1.4"/>
+    <circle cx="220" cy="375" r="2.4"/>
+    <circle cx="285" cy="352" r="1.8"/>
+    <circle cx="355" cy="385" r="2.2"/>
+    <circle cx="420" cy="345" r="1.6"/>
+    <circle cx="465" cy="375" r="2"/>
+    <circle cx="120" cy="405" r="2.4"/>
+    <circle cx="200" cy="430" r="2"/>
+    <circle cx="300" cy="445" r="2.6"/>
+    <circle cx="380" cy="420" r="1.8"/>
+    <circle cx="60"  cy="440" r="2.2"/>
+    <circle cx="455" cy="450" r="2"/>
+    <circle cx="250" cy="470" r="2.4"/>
+  </g>
+
+  <g clip-path="url(#belowGround)" fill="none" stroke="url(#rootGrad)" stroke-width="3" stroke-linecap="round">
+    <path class="root root-1" d="M250 340 q-12 24 -28 44 q-14 14 -30 24"/>
+    <path class="root root-2" d="M250 340 q12 24 28 44 q14 14 30 24"/>
+    <path class="root root-3" d="M250 340 q-4 32 -10 54 q-4 18 -12 30"/>
+    <path class="root root-4" d="M250 340 q8 28 16 46 q6 20 16 32"/>
+    <path class="root root-5" d="M250 340 q0 44 2 66"/>
+    <g stroke-width="1.6" opacity=".85">
+      <path d="M228 372 q-10 8 -22 12"/>
+      <path d="M228 372 q-6 14 -8 26"/>
+      <path d="M272 372 q10 8 22 12"/>
+      <path d="M272 372 q6 14 8 26"/>
+      <path d="M240 396 q-12 6 -20 14"/>
+      <path d="M262 396 q12 6 20 14"/>
+      <path d="M252 412 q-6 14 -4 26"/>
+    </g>
+  </g>
+
+  <ellipse class="seed" cx="250" cy="340" rx="20" ry="14" fill="url(#seedGrad)" stroke="#78350f" stroke-width="1.6"/>
+
+  <g class="plant" clip-path="url(#aboveGround)">
+    <path class="stem" d="M250 340 C 250 300, 248 250, 250 200 S 252 130, 250 80" stroke="url(#stemGrad)" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path class="branch branch-1" d="M250 240 q-30 -6 -56 -18" stroke="url(#stemGrad)" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+    <path class="branch branch-2" d="M250 200 q28 -6 52 -16"   stroke="url(#stemGrad)" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+    <path class="leaf leaf-1" d="M250 300 C 220 296, 196 276, 192 244 C 226 246, 250 260, 250 300 Z" fill="url(#leafA)"/>
+    <path class="leaf leaf-2" d="M250 288 C 280 284, 304 264, 308 232 C 274 234, 250 248, 250 288 Z" fill="url(#leafB)"/>
+    <path class="leaf leaf-3" d="M194 222 C 176 218, 166 204, 164 188 C 182 188, 194 200, 194 222 Z" fill="url(#leafC)"/>
+    <path class="leaf leaf-4" d="M302 184 C 320 180, 330 166, 332 150 C 314 150, 302 162, 302 184 Z" fill="url(#leafA)"/>
+    <path class="leaf leaf-5" d="M250 230 C 226 226, 210 210, 208 190 C 232 190, 250 202, 250 230 Z" fill="url(#leafB)"/>
+    <path class="leaf leaf-6" d="M250 210 C 274 206, 290 190, 292 170 C 268 170, 250 182, 250 210 Z" fill="url(#leafA)"/>
+    <path class="leaf leaf-7" d="M250 170 C 232 168, 220 156, 218 140 C 236 140, 250 150, 250 170 Z" fill="url(#leafC)"/>
+    <path class="leaf leaf-8" d="M250 150 C 268 148, 280 136, 282 120 C 264 120, 250 130, 250 150 Z" fill="url(#leafB)"/>
+
+    <g class="flower flower-1">
+      <circle cx="200" cy="150" r="7" fill="url(#flowerCore)"/>
+      <g fill="#facc15" opacity=".85">
+        <circle cx="195" cy="145" r="3.4"/>
+        <circle cx="205" cy="145" r="3.4"/>
+        <circle cx="200" cy="155" r="3.4"/>
+      </g>
+    </g>
+    <g class="flower flower-2">
+      <circle cx="302" cy="120" r="7" fill="url(#flowerCore)"/>
+      <g fill="#facc15" opacity=".85">
+        <circle cx="297" cy="115" r="3.4"/>
+        <circle cx="307" cy="115" r="3.4"/>
+        <circle cx="302" cy="125" r="3.4"/>
+      </g>
+    </g>
+  </g>
+
+  <ellipse class="droplet" cx="300" cy="60" rx="6" ry="9" fill="url(#drop)"/>
+
+  <g class="particle" fill="#fde68a">
+    <circle cx="120" cy="220" r="2" style="--dx: 30px"/>
+    <circle cx="180" cy="180" r="1.6" style="--dx: -20px; animation-delay: 1.6s"/>
+    <circle cx="340" cy="200" r="2.2" style="--dx: 25px; animation-delay: 3.1s"/>
+    <circle cx="400" cy="260" r="1.8" style="--dx: -15px; animation-delay: 4.5s"/>
+    <circle cx="90"  cy="280" r="1.6" style="--dx: 20px; animation-delay: 2.4s"/>
+  </g>
+
+  <g class="sparkle" fill="#fef3c7">
+    <circle cx="205" cy="145" r="2.2"/>
+    <circle cx="305" cy="118" r="1.8" style="animation-delay: 1.4s"/>
+    <circle cx="255" cy="170" r="1.6" style="animation-delay: 2.1s"/>
+  </g>
+</svg>

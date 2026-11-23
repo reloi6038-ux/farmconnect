@@ -1,0 +1,35 @@
+﻿@keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes modalIn { from { transform: translateY(20px) scale(.96); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+@keyframes skeleton { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.fade-up { animation: fadeUp .6s ease both; }
+.fade-in { animation: fadeIn .5s ease both; }
+.spin { animation: spin 1s linear infinite; }
+
+.toast { animation: slideInRight .3s ease; }
+
+/* Hero text and column fade-in (does NOT touch the .germ SVG) */
+.hero h1,
+.hero p.lead,
+.hero-actions { animation: fadeUp .7s ease both; }
+.hero p.lead  { animation-delay: .1s; }
+.hero-actions { animation-delay: .2s; }
+.hero-visual  { animation: fadeUp .9s ease both; animation-delay: .15s; }
+
+/* The germination SVG controls its own internal animation.
+   Do not add any keyframe or animation here on .germ,
+   or the internal SVG timeline will be overridden. */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

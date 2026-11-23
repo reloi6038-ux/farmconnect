@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html lang="en"><head>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#14532d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FarmConnect">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit Produce — FarmConnect</title>
+<link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/responsive.css">
+</head><body>
+<nav class="navbar" id="navbar"></nav>
+<section class="section"><div class="container" style="max-width:720px">
+  <h2 class="section-title">Edit Produce</h2>
+  <div class="card"><div class="card-body">
+    <form id="produceForm">
+      <div class="form-group"><label>Product Name</label><input class="form-control" id="productName" required></div>
+      <div class="form-group"><label>Description</label><textarea class="form-control" id="description"></textarea></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div class="form-group"><label>Quantity</label><input type="number" class="form-control" id="quantity" required></div>
+        <div class="form-group"><label>Price (₦)</label><input type="number" class="form-control" id="price" required></div>
+      </div>
+      <div class="form-group"><label>Availability</label><select class="form-control" id="availabilityStatus">
+        <option value="available">Available</option><option value="paused">Paused</option><option value="sold">Sold</option>
+      </select></div>
+      <button class="btn btn-primary btn-block" type="submit" id="submitBtn">Save Changes</button>
+    </form>
+  </div></div>
+</div></section>
+<footer id="footer"></footer>
+<script src="/js/api.js"></script><script src="/js/components.js"></script>
+<script>
+if (requireAuth('farmer')) {
+  const id = new URLSearchParams(location.search).get('id');
+  if (!id) { location.href = '/farmer-dashboard.html'; }
+  else {
+    API.get('/produce/' + id).then(r => {
+      const p = r.data;
+      ['productName', 'description', 'quantity', 'price', 'availabilityStatus'].forEach(k => document.getElementById(k).value = p[k] || '');
+    }).catch(e => toast(e.message, 'error'));
+
+    document.getElementById('produceForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true; btn.textContent = 'Saving...';
+      try {
+        await API.put('/produce/' + id, {
+          productName: document.getElementById('productName').value,
+          description: document.getElementById('description').value,
+          quantity: Number(document.getElementById('quantity').value),
+          price: Number(document.getElementById('price').value),
+          availabilityStatus: document.getElementById('availabilityStatus').value
+        });
+        toast('Updated successfully');
+        setTimeout(() => location.href = '/farmer-dashboard.html', 500);
+      } catch (err) { toast(err.message, 'error'); btn.disabled = false; btn.textContent = 'Save Changes'; }
+    };
+  }
+}
+</script>
+</body></html>
+

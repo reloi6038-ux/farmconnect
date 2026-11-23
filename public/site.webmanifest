@@ -1,0 +1,18 @@
+﻿{
+  "name": "FarmConnect — Farm-to-Market Marketplace",
+  "short_name": "FarmConnect",
+  "description": "Buy fresh produce directly from verified Nigerian farmers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fdfbf7",
+  "theme_color": "#14532d",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

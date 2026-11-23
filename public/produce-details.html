@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#14532d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FarmConnect">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Produce Details — FarmConnect</title>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<link rel="stylesheet" href="/css/animations.css">
+</head>
+<body>
+<nav class="navbar" id="navbar"></nav>
+<section class="section">
+  <div class="container" id="detailContainer"><p class="text-muted">Loading...</p></div>
+</section>
+<section class="section section-alt" id="relatedSection" style="display:none">
+  <div class="container">
+    <h2 class="section-title">Related Produce</h2>
+    <p class="section-sub">Similar items from the same category</p>
+    <div class="product-grid" id="relatedGrid"></div>
+  </div>
+</section>
+
+<div class="modal-overlay" id="enquiryModal">
+  <div class="modal">
+    <div class="modal-body">
+      <div class="flex justify-between items-center mb-3">
+        <h3 style="margin:0">Send Enquiry</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeModal('enquiryModal')">×</button>
+      </div>
+      <form id="enquiryForm">
+        <div class="form-group"><label>Subject</label><input class="form-control" id="eSubject" required></div>
+        <div class="form-group"><label>Quantity Needed</label><input type="number" class="form-control" id="eQty" min="1" required></div>
+        <div class="form-group"><label>Your Offer Price (₦)</label><input type="number" class="form-control" id="ePrice" min="0"></div>
+        <div class="form-group"><label>Message</label><textarea class="form-control" id="eMsg" required placeholder="Hello, I'd like to purchase..."></textarea></div>
+        <div class="flex gap-1">
+          <button type="submit" class="btn btn-primary" style="flex:1">Send Enquiry</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal('enquiryModal')" style="flex:1">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<footer id="footer"></footer>
+<script src="/js/api.js"></script>
+<script src="/js/components.js"></script>
+<script src="/js/produce.js"></script>
+</body>
+</html>
+

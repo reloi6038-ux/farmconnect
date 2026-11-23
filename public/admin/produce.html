@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html><html lang="en"><head>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#14532d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FarmConnect">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Produce — FarmConnect</title>
+<link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/responsive.css">
+<link rel="stylesheet" href="/css/admin.css">
+</head><body>
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="brand"><span class="brand-badge">🌾</span> Admin</div>
+    <nav>
+      <a href="/admin/dashboard.html" data-page="dashboard">📊 Dashboard</a>
+      <a href="/admin/users.html" data-page="users">👥 Users</a>
+      <a href="/admin/produce.html" data-page="produce">🌾 Produce</a>
+      <a href="/admin/categories.html" data-page="categories">📁 Categories</a>
+      <a href="/admin/market-prices.html" data-page="market-prices">📈 Market Prices</a>
+      <a href="/admin/enquiries.html" data-page="enquiries">✉️ Enquiries</a>
+      <a href="/admin/messages.html" data-page="messages">💬 Messages</a>
+      <a href="/" style="margin-top:auto">← Back to Site</a>
+      <a href="#" id="adminLogout">Logout</a>
+    </nav>
+  </aside>
+  <main class="admin-content">
+    <h1 style="color:var(--forest);margin-bottom:1.5rem">Produce</h1>
+    <div id="adminRoot"><p class="text-muted">Loading...</p></div>
+  </main>
+</div>
+<script src="/js/api.js"></script>
+<script src="/js/components.js"></script>
+<script src="/js/admin.js"></script>
+</body></html>
+

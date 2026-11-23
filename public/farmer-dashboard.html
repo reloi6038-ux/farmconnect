@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html lang="en"><head>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#14532d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FarmConnect">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farmer Dashboard — FarmConnect</title>
+<link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/responsive.css">
+<link rel="stylesheet" href="/css/dashboard.css"><link rel="stylesheet" href="/css/animations.css">
+</head><body>
+<nav class="navbar" id="navbar"></nav>
+
+<div class="sidebar-layout">
+  <aside class="sidebar">
+    <nav>
+      <a href="/farmer-dashboard.html" class="active">📊 Dashboard</a>
+      <a href="/add-produce.html">➕ Add Produce</a>
+      <a href="/enquiries.html">✉️ Enquiries</a>
+      <a href="/notifications.html">🔔 Notifications</a>
+      <a href="/profile.html">👤 Profile</a>
+    </nav>
+  </aside>
+  <main>
+    <div class="dashboard-header">
+      <h1>Welcome, <span id="userName">Farmer</span></h1>
+      <div class="dashboard-actions">
+        <a href="/add-produce.html" class="btn btn-primary">+ Add Produce</a>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="dash-card"><div class="dash-icon">🌾</div><div class="dash-label">Total Listings</div><div class="dash-value" id="statTotal">—</div></div>
+      <div class="dash-card"><div class="dash-icon">✅</div><div class="dash-label">Active</div><div class="dash-value" id="statActive">—</div></div>
+      <div class="dash-card"><div class="dash-icon">💰</div><div class="dash-label">Sold</div><div class="dash-value" id="statSold">—</div></div>
+      <div class="dash-card"><div class="dash-icon">✉️</div><div class="dash-label">Enquiries</div><div class="dash-value" id="statEnq">—</div></div>
+      <div class="dash-card"><div class="dash-icon">👁️</div><div class="dash-label">Total Views</div><div class="dash-value" id="statViews">—</div></div>
+      <div class="dash-card"><div class="dash-icon">♥</div><div class="dash-label">Favorites</div><div class="dash-value" id="statFavs">—</div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <h3>My Listings</h3>
+        <a href="/add-produce.html" class="btn btn-secondary btn-sm">+ New</a>
+      </div>
+      <div class="panel-body" style="padding:0">
+        <div class="table-wrap" style="box-shadow:none;border:none;border-radius:0">
+          <table><thead><tr><th>Product</th><th>Price</th><th>Qty</th><th>Status</th><th>Views</th><th>Actions</th></tr></thead>
+          <tbody id="listingsTbody"><tr><td colspan="6" class="text-center text-muted">Loading...</td></tr></tbody></table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<footer id="footer"></footer>
+<script src="/js/api.js"></script><script src="/js/components.js"></script><script src="/js/dashboard.js"></script>
+</body></html>
+

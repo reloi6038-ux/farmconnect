@@ -1,0 +1,372 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#14532d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FarmConnect">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FarmConnect — Connecting Farmers Directly to Better Markets</title>
+<meta name="description" content="Nigeria's premium agricultural marketplace connecting smallholder farmers with buyers, restaurants, and bulk purchasers. Transparent prices, zero middlemen.">
+<meta name="keywords" content="Nigeria agriculture, farmers market, buy produce, sell produce, agritech, farm-to-market">
+<meta property="og:title" content="FarmConnect — Farm-to-Market Marketplace">
+<meta property="og:description" content="Buy fresh produce directly from verified Nigerian farmers.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="/favicon.svg">
+<meta property="og:url" content="https://farmconnect.onrender.com/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FarmConnect — Farm-to-Market Marketplace">
+<meta name="twitter:description" content="Buy fresh produce directly from verified Nigerian farmers.">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<link rel="stylesheet" href="/css/animations.css">
+<style>
+  .stars { display: inline-flex; gap: 2px; color: #d1d5db; font-size: 1.15rem; }
+  .stars .filled { color: #f59e0b; }
+  .star-input { display: inline-flex; gap: 4px; font-size: 2rem; cursor: pointer; user-select: none; }
+  .star-input span { color: #d1d5db; transition: color .15s ease, transform .15s ease; }
+  .star-input span:hover,
+  .star-input span.active { color: #f59e0b; transform: scale(1.08); }
+  .review-card { display: flex; flex-direction: column; height: 100%; }
+  .review-card .quote { font-size: 2.5rem; color: var(--leaf); line-height: 1; opacity: .6; }
+  .review-card .body-text { flex: 1; margin: .5rem 0 1rem; color: var(--ink); line-height: 1.65; font-size: .95rem; }
+  .review-card .reviewer { display: flex; align-items: center; gap: .75rem; margin-top: auto; }
+  .avatar-circle {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: linear-gradient(135deg, #14532d, #22c55e);
+    display: grid; place-items: center; color: #fff; font-weight: 700; font-size: .95rem;
+    flex-shrink: 0;
+  }
+  .review-form-card {
+    background: linear-gradient(135deg, #f0fdf4 0%, #fefce8 100%);
+    border-radius: 20px; padding: 2rem; box-shadow: var(--shadow-lg);
+    max-width: 720px; margin: 2.5rem auto 0;
+  }
+  .review-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+  .avg-rating {
+    display: inline-flex; align-items: center; gap: .5rem;
+    padding: .5rem 1rem; background: #fff;
+    border-radius: 999px; box-shadow: var(--shadow);
+    font-weight: 700; color: var(--forest);
+  }
+</style>
+</head>
+<body>
+<nav class="navbar" id="navbar"></nav>
+
+<section class="hero">
+  <div class="container hero-inner">
+    <div>
+      <span class="badge badge-gold" style="margin-bottom:1rem;display:inline-block">🌱 Nigeria's Trusted Agritech Platform</span>
+      <h1>Connecting Farmers Directly to Better Markets.</h1>
+      <p class="lead">Buy fresh produce directly from verified smallholder farmers across Nigeria. Transparent prices, direct connections, zero middlemen.</p>
+      <div class="hero-actions">
+        <a href="/marketplace.html" class="btn btn-primary btn-lg">Explore Produce</a>
+        <a href="/register.html?role=farmer" class="btn btn-outline btn-lg">Join as a Farmer</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <img
+        src="/assets/germination.svg"
+        alt="Animated seed growing into a green plant"
+        class="germ"
+        width="500"
+        height="500"
+        loading="eager"
+        decoding="async">
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Empowering Nigerian Agriculture</h2>
+    <p class="section-sub">A transparent marketplace built for farmers, buyers, and everyone in between.</p>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num" data-count="2500">0</div><div class="stat-label">Farmers Connected</div></div>
+      <div class="stat-card"><div class="stat-num" data-count="8500">0</div><div class="stat-label">Produce Listings</div></div>
+      <div class="stat-card"><div class="stat-num" data-count="1200">0</div><div class="stat-label">Active Buyers</div></div>
+      <div class="stat-card"><div class="stat-num" data-count="36">0</div><div class="stat-label">States Covered</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="section-title">Featured Produce</h2>
+    <p class="section-sub">Fresh from verified Nigerian farmers</p>
+    <div class="product-grid" id="featuredGrid"></div>
+    <div class="text-center mt-4"><a href="/marketplace.html" class="btn btn-primary">Browse Full Marketplace</a></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">How It Works</h2>
+    <p class="section-sub">Four simple steps from farm to market</p>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num">1</div><div class="stat-label">Farmers List Produce</div></div>
+      <div class="stat-card"><div class="stat-num">2</div><div class="stat-label">Buyers Discover</div></div>
+      <div class="stat-card"><div class="stat-num">3</div><div class="stat-label">Send Enquiries</div></div>
+      <div class="stat-card"><div class="stat-num">4</div><div class="stat-label">Transact Directly</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <p class="text-center text-muted" style="font-size:.9rem;text-transform:uppercase;letter-spacing:.1em;margin-bottom:1.5rem;font-weight:600">Trusted across Nigeria's agricultural heartlands</p>
+    <div class="flex justify-center flex-wrap gap-3" style="opacity:.85">
+      <span class="badge badge-green" style="padding:.6rem 1rem;font-size:.85rem">🌾 Kaduna</span>
+      <span class="badge badge-green" style="padding:.6rem 1rem;font-size:.85rem">🌾 Kano</span>
+      <span class="badge badge-green" style="padding:.6rem 1rem;font-size:.85rem">🌾 Enugu</span>
+      <span class="badge badge-green" style="padding:.6rem 1rem;font-size:.85rem">🌾 Lagos</span>
+      <span class="badge badge-green" style="padding:.6rem 1rem;font-size:.85rem">🌾 Oyo</span>
+      <span class="badge badge-green" style="padding:.6rem 1rem;font-size:.85rem">🌾 FCT</span>
+      <span class="badge badge-green" style="padding:.6rem 1rem;font-size:.85rem">🌾 Anambra</span>
+      <span class="badge badge-green" style="padding:.6rem 1rem;font-size:.85rem">🌾 Sokoto</span>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="section-title">Live Market Prices</h2>
+    <p class="section-sub">Information sourced from regional markets across Nigeria</p>
+    <div class="table-wrap"><table><thead><tr>
+      <th>Product</th><th>Market</th><th>State</th><th>Average</th><th>Trend</th>
+    </tr></thead><tbody id="pricePreview"></tbody></table></div>
+    <div class="text-center mt-4"><a href="/market-prices.html" class="btn btn-secondary">See All Prices</a></div>
+  </div>
+</section>
+
+<section class="section" id="reviews">
+  <div class="container">
+    <h2 class="section-title">What Users Say</h2>
+    <p class="section-sub">Real feedback from Nigerian farmers and buyers</p>
+    <div class="text-center mb-4"><span class="avg-rating" id="avgRating">Loading…</span></div>
+
+    <div class="review-grid" id="reviewGrid"></div>
+
+    <div class="text-center mt-4">
+      <button class="btn btn-primary btn-lg" id="writeReviewBtn">✍️ Leave a Review</button>
+    </div>
+
+    <div id="reviewFormWrap" style="display:none">
+      <div class="review-form-card">
+        <h3 style="color:var(--forest);margin-bottom:.25rem">Share Your Experience</h3>
+        <p class="text-muted mb-3" style="font-size:.9rem">Your review helps farmers and buyers decide. Reviews are moderated before publishing.</p>
+        <div id="reviewFormSuccess" style="display:none;padding:1rem;background:#dcfce7;border-radius:10px;color:var(--forest);margin-bottom:1rem"></div>
+        <div id="reviewFormError" style="display:none;padding:1rem;background:#fee2e2;border-radius:10px;color:#991b1b;margin-bottom:1rem"></div>
+        <form id="reviewForm">
+          <div class="form-group">
+            <label>Your Rating *</label>
+            <div class="star-input" id="starInput" role="radiogroup" aria-label="Rating">
+              <span data-val="1">★</span>
+              <span data-val="2">★</span>
+              <span data-val="3">★</span>
+              <span data-val="4">★</span>
+              <span data-val="5">★</span>
+            </div>
+            <input type="hidden" id="ratingValue" value="0">
+          </div>
+          <div class="form-group"><label>Title *</label><input class="form-control" id="reviewTitle" maxlength="120" required placeholder="Summarize your experience"></div>
+          <div class="form-group"><label>Your Review *</label><textarea class="form-control" id="reviewBody" maxlength="800" required placeholder="What did FarmConnect help you do?"></textarea></div>
+          <div class="form-group"><label>Location (optional)</label><input class="form-control" id="reviewLocation" maxlength="80" placeholder="e.g. Kaduna"></div>
+          <div class="flex gap-1">
+            <button type="submit" class="btn btn-primary" id="reviewSubmitBtn" style="flex:1">Submit Review</button>
+            <button type="button" class="btn btn-secondary" id="reviewCancelBtn" style="flex:1">Cancel</button>
+          </div>
+          <p class="text-muted mt-2" style="font-size:.8rem;text-align:center" id="reviewLoginHint"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="section-title">Why FarmConnect?</h2>
+    <p class="section-sub">Built for everyone in the agricultural value chain</p>
+    <div class="product-grid">
+      <div class="card"><div class="card-body"><div style="font-size:2rem">📈</div><h3 class="mt-2">Transparent Pricing</h3><p class="text-muted mt-1">See real market prices and farmer asking prices side by side.</p></div></div>
+      <div class="card"><div class="card-body"><div style="font-size:2rem">🤝</div><h3 class="mt-2">Direct Connections</h3><p class="text-muted mt-1">No middlemen. Talk directly with the farmer who grows your food.</p></div></div>
+      <div class="card"><div class="card-body"><div style="font-size:2rem">🌍</div><h3 class="mt-2">Wider Market Access</h3><p class="text-muted mt-1">Farmers reach buyers beyond their local market.</p></div></div>
+      <div class="card"><div class="card-body"><div style="font-size:2rem">✅</div><h3 class="mt-2">Verified Farmers</h3><p class="text-muted mt-1">Blue-check verification for trusted, established producers.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container text-center">
+    <h2 class="section-title">Ready to Join Nigeria's Fastest-Growing Agricultural Marketplace?</h2>
+    <p class="section-sub">Whether you grow food or buy it — FarmConnect connects you directly. Free to join. No commissions on enquiries.</p>
+    <div class="flex justify-center gap-2 flex-wrap">
+      <a href="/register.html?role=farmer" class="btn btn-primary btn-lg">Join as a Farmer →</a>
+      <a href="/register.html?role=buyer" class="btn btn-outline btn-lg">Join as a Buyer →</a>
+    </div>
+    <p class="text-muted mt-3" style="font-size:.88rem">Trusted by farmers in Kaduna, Kano, Enugu, Oyo, and beyond</p>
+  </div>
+</section>
+
+<footer id="footer"></footer>
+<script src="/js/api.js"></script>
+<script src="/js/components.js"></script>
+<script>
+(async () => {
+  try {
+    const r = await API.get('/produce?limit=4&sort=popular');
+    const grid = document.getElementById('featuredGrid');
+    if (!r.data.length) { grid.innerHTML = '<div class="empty-state"><div class="emoji">🌱</div><p>No produce listed yet.</p></div>'; }
+    else {
+      grid.innerHTML = r.data.map(p => `
+        <div class="product-card">
+          <div class="product-img">${(p.images && p.images.length) ? `<img src="${p.images[0]}" alt="${escapeHtml(p.productName)}" style="width:100%;height:100%;object-fit:cover" loading="lazy">` : '🌿'}</div>
+          <div class="card-body">
+            <div class="flex gap-1 flex-wrap"><span class="badge badge-green">${escapeHtml(p.category && p.category.name || 'Produce')}</span>${p.organic ? '<span class="badge badge-gold">Organic</span>' : ''}</div>
+            <h3>${escapeHtml(p.productName)}</h3>
+            <div class="price">${fmtNaira(p.price)}<span style="font-size:.8rem;color:var(--muted);font-weight:500"> /${escapeHtml(p.unit)}</span></div>
+            <div class="meta">${escapeHtml(p.location)}, ${escapeHtml(p.state)}</div>
+            <div class="farmer-line">👨‍🌾 ${escapeHtml(p.farmer && p.farmer.name || 'Farmer')} ${p.farmer && p.farmer.verified ? '✅' : ''}</div>
+            <a href="/produce-details.html?id=${p._id}" class="btn btn-primary btn-sm btn-block" style="margin-top:.5rem">View Details</a>
+          </div>
+        </div>`).join('');
+    }
+  } catch (e) { console.error(e); }
+
+  try {
+    const r = await API.get('/market-prices?limit=5');
+    const tb = document.getElementById('pricePreview');
+    if (!r.data.length) tb.innerHTML = '<tr><td colspan="5" class="text-muted text-center">No prices available.</td></tr>';
+    else {
+      tb.innerHTML = r.data.map(p => {
+        const arrow = p.trend === 'increasing' ? '↑' : p.trend === 'decreasing' ? '↓' : '→';
+        const cls = p.trend === 'increasing' ? 'badge-red' : p.trend === 'decreasing' ? 'badge-green' : 'badge-gray';
+        return `<tr><td><strong>${escapeHtml(p.product)}</strong></td><td>${escapeHtml(p.market)}</td><td>${escapeHtml(p.state)}</td><td><strong>${fmtNaira(p.averagePrice)}</strong></td><td><span class="badge ${cls}">${arrow} ${escapeHtml(p.trend)}</span></td></tr>`;
+      }).join('');
+    }
+  } catch (e) { console.error(e); }
+
+  const els = document.querySelectorAll('[data-count]');
+  els.forEach(el => {
+    const target = +el.dataset.count; let cur = 0;
+    const step = Math.max(1, Math.ceil(target / 60));
+    const t = setInterval(() => {
+      cur += step;
+      if (cur >= target) { cur = target; clearInterval(t); }
+      el.textContent = cur.toLocaleString();
+    }, 25);
+  });
+})();
+
+function starsHtml(rating) {
+  let s = '';
+  for (let i = 1; i <= 5; i++) s += `<span class="${i <= rating ? 'filled' : ''}">★</span>`;
+  return `<span class="stars">${s}</span>`;
+}
+
+async function loadReviews() {
+  const grid = document.getElementById('reviewGrid');
+  const avgBox = document.getElementById('avgRating');
+  grid.innerHTML = '<div class="skeleton" style="height:180px;grid-column:1/-1"></div><div class="skeleton" style="height:180px"></div><div class="skeleton" style="height:180px"></div>';
+  try {
+    const r = await API.get('/reviews?limit=6');
+    avgBox.innerHTML = `⭐ ${r.average} / 5 <span style="font-weight:500;color:var(--muted);margin-left:.25rem">(${r.total} review${r.total === 1 ? '' : 's'})</span>`;
+    if (!r.data.length) { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="emoji">💬</div><p>No reviews yet. Be the first!</p></div>'; return; }
+    grid.innerHTML = r.data.map(rv => {
+      const initials = (rv.name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+      return `
+        <div class="card review-card"><div class="card-body">
+          <div class="quote">"</div>
+          <div>${starsHtml(rv.rating)}</div>
+          <h3 style="margin:.4rem 0;font-size:1.05rem;color:var(--forest)">${escapeHtml(rv.title)}</h3>
+          <p class="body-text">${escapeHtml(rv.body)}</p>
+          <div class="reviewer">
+            <div class="avatar-circle">${initials}</div>
+            <div>
+              <div style="font-weight:700">${escapeHtml(rv.name)} ${rv.role === 'farmer' ? '🌾' : '🛒'}</div>
+              <div class="text-muted" style="font-size:.82rem">${escapeHtml(rv.location || (rv.role === 'farmer' ? 'Farmer' : 'Buyer'))}</div>
+            </div>
+          </div>
+        </div></div>`;
+    }).join('');
+  } catch (e) { grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="emoji">⚠️</div><p>${escapeHtml(e.message)}</p></div>`; }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadReviews();
+
+  const starInput = document.getElementById('starInput');
+  const ratingValue = document.getElementById('ratingValue');
+  let currentRating = 0;
+  function paintStars(n) {
+    starInput.querySelectorAll('span').forEach((s, i) => {
+      s.classList.toggle('active', i < n);
+    });
+  }
+  starInput.addEventListener('mouseover', (e) => {
+    if (e.target.dataset.val) paintStars(Number(e.target.dataset.val));
+  });
+  starInput.addEventListener('mouseleave', () => paintStars(currentRating));
+  starInput.addEventListener('click', (e) => {
+    if (!e.target.dataset.val) return;
+    currentRating = Number(e.target.dataset.val);
+    ratingValue.value = currentRating;
+    paintStars(currentRating);
+  });
+
+  document.getElementById('writeReviewBtn').onclick = () => {
+    const wrap = document.getElementById('reviewFormWrap');
+    wrap.style.display = 'block';
+    wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!API.token()) {
+      document.getElementById('reviewLoginHint').innerHTML = '🔒 You must be <a href="/login.html">logged in</a> to leave a review.';
+    } else {
+      API.get('/reviews/mine').then(r => {
+        if (r.data) {
+          document.getElementById('reviewForm').style.display = 'none';
+          document.getElementById('reviewFormSuccess').style.display = 'block';
+          document.getElementById('reviewFormSuccess').innerHTML = '✅ You already submitted a review. Thank you!';
+        }
+      }).catch(() => {});
+    }
+  };
+
+  document.getElementById('reviewCancelBtn').onclick = () => {
+    document.getElementById('reviewFormWrap').style.display = 'none';
+  };
+
+  document.getElementById('reviewForm').onsubmit = async (e) => {
+    e.preventDefault();
+    if (!API.token()) { location.href = '/login.html'; return; }
+    const rating = Number(document.getElementById('ratingValue').value);
+    if (rating < 1) { toast('Please select a rating', 'error'); return; }
+    const btn = document.getElementById('reviewSubmitBtn');
+    btn.disabled = true; btn.textContent = 'Submitting…';
+    try {
+      await API.post('/reviews', {
+        rating,
+        title: document.getElementById('reviewTitle').value.trim(),
+        body: document.getElementById('reviewBody').value.trim(),
+        location: document.getElementById('reviewLocation').value.trim()
+      });
+      document.getElementById('reviewForm').style.display = 'none';
+      document.getElementById('reviewFormSuccess').style.display = 'block';
+      document.getElementById('reviewFormSuccess').innerHTML = '✅ Thank you! Your review has been submitted and will appear after moderation.';
+      document.getElementById('reviewFormError').style.display = 'none';
+      toast('Thank you! Your review is being reviewed.');
+    } catch (err) {
+      const errBox = document.getElementById('reviewFormError');
+      errBox.textContent = err.message;
+      errBox.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Submit Review';
+    }
+  };
+});
+</script>
+</body>
+</html>
+

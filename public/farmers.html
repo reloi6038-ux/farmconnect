@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html lang="en"><head>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#14532d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FarmConnect">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farmers — FarmConnect</title>
+<link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/responsive.css">
+</head><body>
+<nav class="navbar" id="navbar"></nav>
+<section class="section"><div class="container">
+  <h2 class="section-title">Our Farmers</h2>
+  <p class="section-sub">Meet the verified producers on FarmConnect</p>
+  <div class="card mb-3"><div class="card-body">
+    <div class="flex gap-1">
+      <input class="form-control" id="search" placeholder="Search by name">
+      <input class="form-control" id="state" placeholder="State">
+      <button class="btn btn-primary" id="applyBtn">Search</button>
+    </div>
+  </div></div>
+  <div id="farmersGrid" class="product-grid"></div>
+</div></section>
+<footer id="footer"></footer>
+<script src="/js/api.js"></script><script src="/js/components.js"></script>
+<script>
+async function load() {
+  const grid = document.getElementById('farmersGrid');
+  grid.innerHTML = skeletonCards(6);
+  const params = new URLSearchParams({
+    search: document.getElementById('search').value,
+    state: document.getElementById('state').value
+  });
+  try {
+    const r = await API.get('/farmers?' + params);
+    if (!r.data.length) { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="emoji">👨‍🌾</div><p>No farmers found.</p></div>'; return; }
+    grid.innerHTML = r.data.map(f => `
+      <div class="product-card">
+        <div class="product-img" style="font-size:3rem">👨‍🌾</div>
+        <div class="card-body">
+          <h3>${escapeHtml(f.name)} ${f.verified ? '✅' : ''}</h3>
+          <p class="meta">${escapeHtml(f.location || '')}${f.location && f.state ? ', ' : ''}${escapeHtml(f.state || '')}</p>
+          ${f.bio ? `<p class="text-muted mt-1" style="font-size:.85rem">${escapeHtml(f.bio.substring(0, 100))}</p>` : ''}
+        </div>
+      </div>`).join('');
+  } catch (e) { toast(e.message, 'error'); }
+}
+document.getElementById('applyBtn').onclick = load;
+document.getElementById('search').addEventListener('keydown', e => { if (e.key === 'Enter') load(); });
+load();
+</script>
+</body></html>
+

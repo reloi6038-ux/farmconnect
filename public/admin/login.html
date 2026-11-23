@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html><html lang="en"><head>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#14532d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FarmConnect"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Admin Login — FarmConnect</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/responsive.css"></head><body>
+<nav class="navbar" id="navbar"></nav>
+<section class="section"><div class="container" style="max-width:440px">
+  <h2 class="section-title">Admin Login</h2>
+  <div class="card"><div class="card-body"><form id="adminLoginForm">
+    <div class="form-group"><label>Email</label><input type="email" class="form-control" id="email" value="admin@farmconnect.ng" required></div>
+    <div class="form-group"><label>Password</label><input type="password" class="form-control" id="password" required></div>
+    <button class="btn btn-primary btn-block" type="submit">Sign In</button>
+  </form></div></div>
+</div></section>
+<footer id="footer"></footer>
+<script src="/js/api.js"></script><script src="/js/components.js"></script>
+<script>
+document.getElementById('adminLoginForm').onsubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const r = await API.post('/auth/login', { email: document.getElementById('email').value, password: document.getElementById('password').value });
+    if (r.data.role !== 'admin') throw new Error('Not an admin account');
+    saveSession(r.data);
+    toast('Welcome, Admin');
+    setTimeout(() => location.href = '/admin/dashboard.html', 400);
+  } catch (err) { toast(err.message, 'error'); }
+};
+</script>
+</body></html>
+

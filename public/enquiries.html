@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html lang="en"><head>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#14532d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FarmConnect">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enquiries — FarmConnect</title>
+<link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/responsive.css">
+<link rel="stylesheet" href="/css/dashboard.css">
+</head><body>
+<nav class="navbar" id="navbar"></nav>
+<section class="section"><div class="container">
+  <h2 class="section-title">My Enquiries</h2>
+  <div class="card mt-3"><div class="card-body" style="padding:0">
+    <div class="table-wrap" style="box-shadow:none;border:none">
+      <table><thead><tr><th>Produce</th><th>With</th><th>Qty</th><th>Offer</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+      <tbody id="enqTbody"><tr><td colspan="7" class="text-center text-muted">Loading...</td></tr></tbody></table>
+    </div>
+  </div></div>
+</div></section>
+
+<div class="modal-overlay" id="respondModal"><div class="modal"><div class="modal-body">
+  <h3>Respond to Enquiry</h3>
+  <form id="respondForm">
+    <input type="hidden" id="respondId">
+    <div class="form-group"><label>Your Response</label><textarea class="form-control" id="respondText" required></textarea></div>
+    <div class="form-group"><label>Update Status</label><select class="form-control" id="respondStatus">
+      <option value="responded">Responded</option><option value="accepted">Accepted</option><option value="rejected">Rejected</option>
+    </select></div>
+    <div class="flex gap-1">
+      <button type="submit" class="btn btn-primary" style="flex:1">Send Response</button>
+      <button type="button" class="btn btn-secondary" onclick="closeModal('respondModal')" style="flex:1">Cancel</button>
+    </div>
+  </form>
+</div></div></div>
+
+<footer id="footer"></footer>
+<script src="/js/api.js"></script><script src="/js/components.js"></script>
+<script src="/js/enquiries.js"></script>
+</body></html>
+

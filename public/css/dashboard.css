@@ -1,0 +1,52 @@
+﻿.dashboard-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+}
+.dashboard-header h1 { font-size: 1.9rem; color: var(--forest); }
+.dashboard-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+
+.sidebar-layout {
+  display: grid; grid-template-columns: 240px 1fr; gap: 2rem;
+  max-width: 1240px; margin: 2rem auto; padding: 0 24px;
+}
+.sidebar {
+  background: #fff; border-radius: var(--radius); padding: 1.25rem;
+  box-shadow: var(--shadow); border: 1px solid var(--border);
+  align-self: start; position: sticky; top: 100px;
+}
+.sidebar nav { display: flex; flex-direction: column; gap: .25rem; }
+.sidebar nav a {
+  padding: .75rem 1rem; border-radius: 8px; color: var(--ink);
+  font-size: .92rem; font-weight: 500; display: flex; align-items: center; gap: .6rem;
+}
+.sidebar nav a:hover { background: var(--beige); color: var(--forest); }
+.sidebar nav a.active { background: var(--forest); color: #fff; }
+
+.dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+.dash-card {
+  background: #fff; border-radius: var(--radius); padding: 1.5rem;
+  box-shadow: var(--shadow); border: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: .35rem;
+  transition: transform .25s, box-shadow .25s;
+}
+.dash-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.dash-card .dash-label { font-size: .82rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
+.dash-card .dash-value { font-size: 2.2rem; font-weight: 800; color: var(--forest); line-height: 1; }
+.dash-card .dash-icon { font-size: 1.5rem; margin-bottom: .25rem; }
+
+.panel {
+  background: #fff; border-radius: var(--radius); box-shadow: var(--shadow);
+  border: 1px solid var(--border); overflow: hidden; margin-bottom: 2rem;
+}
+.panel-header {
+  padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.panel-header h3 { font-size: 1.15rem; color: var(--forest); }
+.panel-body { padding: 1.5rem; }
+
+@media (max-width: 768px) {
+  .sidebar-layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; }
+  .dash-card .dash-value { font-size: 1.7rem; }
+}

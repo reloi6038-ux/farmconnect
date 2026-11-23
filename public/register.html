@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html lang="en"><head>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#14532d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FarmConnect">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register — FarmConnect</title>
+<link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/responsive.css">
+</head><body>
+<nav class="navbar" id="navbar"></nav>
+<section class="section"><div class="container" style="max-width:560px">
+  <h2 class="section-title">Join FarmConnect</h2>
+  <p class="section-sub">Free forever. No credit card required.</p>
+  <div class="card"><div class="card-body">
+    <form id="registerForm">
+      <div class="form-group"><label>I am a</label>
+        <div class="flex gap-1">
+          <label style="flex:1;padding:1rem;border:2px solid var(--border);border-radius:10px;cursor:pointer;text-align:center" id="roleFarmer">
+            <input type="radio" name="role" value="farmer" style="display:none" checked>
+            <div style="font-size:1.5rem">🌾</div><strong>Farmer</strong>
+          </label>
+          <label style="flex:1;padding:1rem;border:2px solid var(--border);border-radius:10px;cursor:pointer;text-align:center" id="roleBuyer">
+            <input type="radio" name="role" value="buyer" style="display:none">
+            <div style="font-size:1.5rem">🛒</div><strong>Buyer</strong>
+          </label>
+        </div>
+      </div>
+      <div class="form-group"><label>Full Name</label><input class="form-control" id="name" required></div>
+      <div class="form-group"><label>Email</label><input type="email" class="form-control" id="email" required></div>
+      <div class="form-group"><label>Phone</label><input class="form-control" id="phone" placeholder="08012345678"></div>
+      <div class="form-group"><label>State</label><input class="form-control" id="state" placeholder="e.g. Kaduna"></div>
+      <div class="form-group"><label>City / Location</label><input class="form-control" id="location" placeholder="e.g. Zaria"></div>
+      <div id="farmerFields" class="form-group" style="display:none">
+        <label>Farm Name</label><input class="form-control" id="farmName" placeholder="e.g. Musa Family Farms">
+      </div>
+      <div class="form-group"><label>Password</label><input type="password" class="form-control" id="password" minlength="6" required><div class="form-hint">Minimum 6 characters</div></div>
+      <button class="btn btn-primary btn-block" type="submit" id="submitBtn">Create Account</button>
+    </form>
+    <p class="text-center mt-3" style="font-size:.9rem">Already registered? <a href="/login.html">Sign in</a></p>
+  </div></div>
+</div></section>
+<footer id="footer"></footer>
+<script src="/js/api.js"></script><script src="/js/components.js"></script><script src="/js/auth.js"></script>
+</body></html>
+
