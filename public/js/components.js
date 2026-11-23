@@ -126,5 +126,110 @@ function skeletonCards(n) {
 
 document.addEventListener('DOMContentLoaded', () => {
   renderNavbar();
+  renderBreadcrumbs();
   renderFooter();
 });
+
+// ---------- BREADCRUMBS ----------
+function getBreadcrumbsFromPath() {
+  const path = location.pathname.replace(/^\/+|\/+$/g, '').replace(/\.html$/, '');
+  const p = new URLSearchParams(location.search);
+  const role = localStorage.getItem('fmc_role');
+
+  // Home
+  const trail = [{ label: 'Home', href: '/' }];
+
+  // Admin routes
+  if (path.startsWith('admin/')) {
+    const adminPage = path.replace('admin/', '');
+    const map = {
+      dashboard: 'Dashboard',
+      users: 'Users',
+      produce: 'Produce',
+      categories: 'Categories',
+      'market-prices': 'Market Prices',
+      enquiries: 'Enquiries',
+      messages: 'Messages',
+      reviews: 'Reviews',
+      login: 'Login'
+    };
+    trail.push({ label: 'Admin', href: '/admin/dashboard.html' });
+    if (map[adminPage] && adminPage !== 'dashboard') trail.push({ label: map[adminPage] });
+    if (adminPage === 'login') trail.splice(1, 1);
+    return trail;
+  }
+
+  // Public + dashboard routes
+  const map = {
+    '': 'Home',
+    'marketplace': 'Marketplace',
+    'farmers': 'Farmers',
+    'farmer-profile': 'Farmer Profile',
+    'market-prices': 'Market Prices',
+    'about': 'About',
+    'contact': 'Contact',
+    'faq': 'FAQ',
+    'terms': 'Terms',
+    'privacy': 'Privacy',
+    'login': 'Login',
+    'register': 'Register',
+    'produce-details': 'Produce Details',
+    'farmer-dashboard': 'Dashboard',
+    'buyer-dashboard': 'Dashboard',
+    'add-produce': 'Add Produce',
+    'edit-produce': 'Edit Produce',
+    'enquiries': 'Enquiries',
+    'favorites': 'Favorites',
+    'notifications': 'Notifications',
+    'profile': 'Profile'
+  };
+
+  if (path === '') return trail; // homepage — no breadcrumbs
+
+  // Dashboard children
+  const dashboardChildren = ['add-produce', 'edit-produce', 'enquiries', 'favorites', 'notifications', 'profile'];
+  if (dashboardChildren.includes(path)) {
+    const dashHref = role === 'farmer' ? '/farmer-dashboard.html' : role === 'buyer' ? '/buyer-dashboard.html' : '/';
+    trail.push({ label: 'Dashboard', href: dashHref });
+    trail.push({ label: map[path] });
+    return trail;
+  }
+
+  // Direct children
+  if (map[path]) {
+    trail.push({ label: map[path], href: null });
+    return trail;
+  }
+
+  // Fallback
+  trail.push({ label: path.charAt(0).toUpperCase() + path.slice(1) });
+  return trail;
+}
+
+function renderBreadcrumbs(items) {
+  const container = document.getElementById('breadcrumbs');
+  if (!container) return;
+
+  const trail = items || window.BREADCRUMBS || getBreadcrumbsFromPath();
+  if (!trail || trail.length <= 1) {
+    container.innerHTML = '';
+    container.style.display = 'none';
+    return;
+  }
+
+  const html = trail.map((item, i) => {
+    const isLast = i === trail.length - 1;
+    const icon = i === 0 ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:.3rem"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>' : '';
+    if (isLast || !item.href) {
+      return `<li style="display:inline-flex;align-items:center;color:var(--muted);font-weight:500">${icon}${escapeHtml(item.label)}</li>`;
+    }
+    return `<li style="display:inline-flex;align-items:center"><a href="${item.href}" style="display:inline-flex;align-items:center;color:var(--forest)">${icon}${escapeHtml(item.label)}</a></li>`;
+  }).join('<li style="display:inline-flex;align-items:center;color:var(--border);margin:0 .5rem" aria-hidden="true">›</li>');
+
+  container.innerHTML = `<nav aria-label="Breadcrumb"><ol style="list-style:none;display:flex;flex-wrap:wrap;align-items:center;gap:.25rem;padding:0;margin:0;font-size:.85rem">${html}</ol></nav>`;
+  container.style.display = 'block';
+}
+
+window.renderBreadcrumbs = renderBreadcrumbs;
+window.getBreadcrumbsFromPath = getBreadcrumbsFromPath;
+

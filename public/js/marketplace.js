@@ -263,6 +263,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   load();
   loadPresets();
 
+  // Dynamic breadcrumb if category is in URL
+  if (window.renderBreadcrumbs) {
+    const catId = new URLSearchParams(location.search).get('category');
+    if (catId) {
+      const cat = categories.find(c => c._id === catId);
+      if (cat) {
+        window.renderBreadcrumbs([
+          { label: 'Home', href: '/' },
+          { label: 'Marketplace', href: '/marketplace.html' },
+          { label: cat.name }
+        ]);
+      }
+    }
+  }
+
   // Price slider
   $('f-price-min').addEventListener('input', updatePriceUI);
   $('f-price-max').addEventListener('input', updatePriceUI);
@@ -283,4 +298,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Mobile toggle
   $('mobileFilterToggle').onclick = () => $('filterPanel').classList.toggle('open');
 });
+
 

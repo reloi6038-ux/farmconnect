@@ -7,6 +7,16 @@ async function loadDetails() {
     const r = await API.get('/produce/' + produceId);
     currentProduce = r.data;
     const p = r.data;
+
+    // Update breadcrumbs with real produce name
+    if (window.renderBreadcrumbs) {
+      window.renderBreadcrumbs([
+        { label: 'Home', href: '/' },
+        { label: 'Marketplace', href: '/marketplace.html' },
+        { label: p.category && p.category.name ? p.category.name : 'Produce', href: '/marketplace.html?category=' + (p.category ? p.category._id : '') },
+        { label: p.productName }
+      ]);
+    }
     const farmer = p.farmer || {};
     const cat = p.category || {};
 
@@ -269,5 +279,6 @@ function initProduceReviewForm() {
     s.addEventListener('click', () => { current = Number(s.dataset.val); ratingInput.value = current; paint(current); });
   });
 }
+
 
 
