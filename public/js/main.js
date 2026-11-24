@@ -215,3 +215,83 @@
     loadLiveStats();
   }
 })();
+
+// ---------- Why FarmConnect — 3D Tilt + Live Metrics ----------
+(function () {
+  const grid = document.getElementById('whyGrid');
+  if (!grid) return;
+
+  const cards = grid.querySelectorAll('.why-card');
+  const MAX_TILT = 10; // degrees
+
+  // Skip tilt on touch devices
+  const isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!isTouch && !prefersReduced) {
+    cards.forEach((card) => {
+      const inner = card.querySelector('.why-card-inner');
+
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const cx = rect.width / 2;
+        const cy = rect.height / 2;
+        const px = (x - cx) / cx;
+        const py = (y - cy) / cy;
+
+        const rotateY = px * MAX_TILT;
+        const rotateX = -py * MAX_TILT;
+
+        card.style.transform = `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-6px)`;
+        card.style.boxShadow = `${(-rotateY * 1.5).toFixed(1)}px ${(rotateX * 1.5 + 20).toFixed(1)}px 40px rgba(0,0,0,.15)`;
+
+        // Update shine position
+        const pctX = (x / rect.width) * 100;
+        const pctY = (y / rect.height) * 100;
+        inner.style.setProperty('--mx', pctX + '%');
+        inner.style.setProperty('--my', pctY + '%');
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+        card.style.boxShadow = '';
+        inner.style.setProperty('--mx', '50%');
+        inner.style.setProperty('--my', '50%');
+      });
+    });
+  }
+
+  // Load live metrics
+  (async function loadWhyMetrics() {
+    try {
+      const [statsRes, pricesRes] = await Promise.all([
+        fetch('/api/stats/public').then(r => r.json()),
+        fetch('/api/market-prices?limit=1').then(r => r.json())
+      ]);
+
+      if (!statsRes.success) throw new Error('Stats failed');
+      const s = statsRes.data;
+      const priceCount = pricesRes.success && pricesRes.pagination ? pricesRes.pagination.totalItems : 0;
+
+      const setMetric = (id, text) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.textContent = text;
+          el.classList.remove('loading');
+        }
+      };
+
+      setMetric('whyMetricPrices', `${priceCount} prices tracked`);
+      setMetric('whyMetricFarmers', `${s.farmers} farmers active`);
+      setMetric('whyMetricStates', `${s.states} states covered`);
+      setMetric('whyMetricVerified', `${s.farmers} verified farmers`);
+      setMetric('whyMetricEnquiries', `${s.enquiries} enquiries sent`);
+      setMetric('whyMetricRating', `${s.avgRating} / 5 avg rating`);
+    } catch (e) {
+      console.warn('[why-metrics]', e);
+      // Leave skeleton state — better than showing wrong numbers
+    }
+  })();
+})();

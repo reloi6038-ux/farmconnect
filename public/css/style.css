@@ -636,3 +636,148 @@ tr:hover td { background: rgba(245, 240, 230, .5); }
   .journey-stage { opacity: 1; transform: none; }
   .journey-progress { transform: none; }
 }
+
+/* ---------- Why FarmConnect — 3D Tilt Cards ---------- */
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  perspective: 1200px;
+}
+
+.why-card {
+  position: relative;
+  border-radius: 16px;
+  transform-style: preserve-3d;
+  transition: transform .35s cubic-bezier(.2,.8,.3,1), box-shadow .35s ease;
+  will-change: transform;
+  cursor: pointer;
+}
+
+.why-card-inner {
+  position: relative;
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.75rem 1.5rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  height: 100%;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: border-color .3s ease;
+}
+
+.why-card-inner::before {
+  /* Cursor-following shine */
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: radial-gradient(
+    circle at var(--mx, 50%) var(--my, 50%),
+    rgba(34, 197, 94, 0.14) 0%,
+    transparent 45%
+  );
+  opacity: 0;
+  transition: opacity .3s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.why-card:hover .why-card-inner::before {
+  opacity: 1;
+}
+
+.why-card:hover .why-card-inner {
+  border-color: var(--green);
+}
+
+.why-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  margin-bottom: 1rem;
+  display: inline-block;
+  transition: transform .45s cubic-bezier(.34,1.56,.64,1);
+  transform: translateZ(30px);
+}
+
+.why-card:hover .why-icon {
+  transform: translateZ(50px) scale(1.18) rotate(-6deg);
+}
+
+.why-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--forest);
+  margin-bottom: .5rem;
+  transform: translateZ(20px);
+  position: relative;
+  z-index: 2;
+}
+
+.why-desc {
+  font-size: .92rem;
+  color: var(--muted);
+  line-height: 1.55;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.why-metric {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .35rem .75rem;
+  background: var(--beige);
+  color: var(--forest);
+  font-size: .78rem;
+  font-weight: 700;
+  border-radius: 999px;
+  letter-spacing: .01em;
+  position: relative;
+  z-index: 2;
+  transform: translateZ(25px);
+  transition: background .3s ease;
+}
+
+.why-card:hover .why-metric {
+  background: #dcfce7;
+}
+
+/* Skeleton state while loading metrics */
+.why-metric.loading {
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: skeleton 1.5s ease-in-out infinite;
+  color: transparent;
+  min-width: 100px;
+}
+
+/* Disable 3D tilt on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .why-card {
+    transition: transform .25s ease;
+  }
+  .why-card:active {
+    transform: scale(.98);
+  }
+  .why-card:hover .why-icon {
+    transform: none;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .why-card,
+  .why-card-inner,
+  .why-icon,
+  .why-metric {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+  .why-card-inner::before {
+    display: none;
+  }
+}

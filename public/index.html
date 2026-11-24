@@ -273,11 +273,60 @@
   <div class="container">
     <h2 class="section-title">Why FarmConnect?</h2>
     <p class="section-sub">Built for everyone in the agricultural value chain</p>
-    <div class="product-grid">
-      <div class="card"><div class="card-body"><div style="font-size:2rem">📈</div><h3 class="mt-2">Transparent Pricing</h3><p class="text-muted mt-1">See real market prices and farmer asking prices side by side.</p></div></div>
-      <div class="card"><div class="card-body"><div style="font-size:2rem">🤝</div><h3 class="mt-2">Direct Connections</h3><p class="text-muted mt-1">No middlemen. Talk directly with the farmer who grows your food.</p></div></div>
-      <div class="card"><div class="card-body"><div style="font-size:2rem">🌍</div><h3 class="mt-2">Wider Market Access</h3><p class="text-muted mt-1">Farmers reach buyers beyond their local market.</p></div></div>
-      <div class="card"><div class="card-body"><div style="font-size:2rem">✅</div><h3 class="mt-2">Verified Farmers</h3><p class="text-muted mt-1">Blue-check verification for trusted, established producers.</p></div></div>
+    <div class="why-grid" id="whyGrid">
+      <div class="why-card">
+        <div class="why-card-inner">
+          <div class="why-icon">📈</div>
+          <h3 class="why-title">Transparent Pricing</h3>
+          <p class="why-desc">See real market prices and farmer asking prices side by side.</p>
+          <div class="why-metric loading" id="whyMetricPrices"><span class="loading-inner"></span></div>
+        </div>
+      </div>
+
+      <div class="why-card">
+        <div class="why-card-inner">
+          <div class="why-icon">🤝</div>
+          <h3 class="why-title">Direct Connections</h3>
+          <p class="why-desc">No middlemen. Talk directly with the farmer who grows your food.</p>
+          <div class="why-metric loading" id="whyMetricFarmers"><span class="loading-inner"></span></div>
+        </div>
+      </div>
+
+      <div class="why-card">
+        <div class="why-card-inner">
+          <div class="why-icon">🌍</div>
+          <h3 class="why-title">Wider Market Access</h3>
+          <p class="why-desc">Farmers reach buyers beyond their local market.</p>
+          <div class="why-metric loading" id="whyMetricStates">36 states covered</div>
+        </div>
+      </div>
+
+      <div class="why-card">
+        <div class="why-card-inner">
+          <div class="why-icon">✅</div>
+          <h3 class="why-title">Verified Farmers</h3>
+          <p class="why-desc">Blue-check verification for trusted, established producers.</p>
+          <div class="why-metric loading" id="whyMetricVerified"><span class="loading-inner"></span></div>
+        </div>
+      </div>
+
+      <div class="why-card">
+        <div class="why-card-inner">
+          <div class="why-icon">💬</div>
+          <h3 class="why-title">Direct Enquiries</h3>
+          <p class="why-desc">Send questions, quantities, and offer prices instantly to any farmer.</p>
+          <div class="why-metric loading" id="whyMetricEnquiries"><span class="loading-inner"></span></div>
+        </div>
+      </div>
+
+      <div class="why-card">
+        <div class="why-card-inner">
+          <div class="why-icon">⭐</div>
+          <h3 class="why-title">Community Reviews</h3>
+          <p class="why-desc">Real reviews from real buyers and farmers across Nigeria.</p>
+          <div class="why-metric loading" id="whyMetricRating"><span class="loading-inner"></span></div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -453,6 +502,8 @@ document.addEventListener('DOMContentLoaded', () => {
 <script src="/js/main.js"></script>
 </body>
 </html>
+
+
 
 
 
