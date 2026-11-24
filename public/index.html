@@ -23,6 +23,7 @@
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/responsive.css">
 <link rel="stylesheet" href="/css/animations.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   .stars { display: inline-flex; gap: 2px; color: #d1d5db; font-size: 1.15rem; }
   .stars .filled { color: #f59e0b; }
@@ -214,14 +215,41 @@
   </div>
 </section>
 
-<section class="section section-alt">
+<section class="section section-alt" id="marketIntelligence">
   <div class="container">
-    <h2 class="section-title">Live Market Prices</h2>
-    <p class="section-sub">Information sourced from regional markets across Nigeria</p>
-    <div class="table-wrap"><table><thead><tr>
-      <th>Product</th><th>Market</th><th>State</th><th>Average</th><th>Trend</th>
-    </tr></thead><tbody id="pricePreview"></tbody></table></div>
-    <div class="text-center mt-4"><a href="/market-prices.html" class="btn btn-secondary">See All Prices</a></div>
+    <h2 class="section-title">Market Intelligence</h2>
+    <p class="section-sub">Real prices, real trends — from markets across Nigeria</p>
+
+    <div class="insight-grid" id="insightGrid">
+      <div class="insight-card skeleton-insight"></div>
+      <div class="insight-card skeleton-insight"></div>
+      <div class="insight-card skeleton-insight"></div>
+      <div class="insight-card skeleton-insight"></div>
+    </div>
+
+    <div class="trend-chart-panel">
+      <div class="trend-header">
+        <div>
+          <h3 style="color:var(--forest);margin:0;font-size:1.2rem">Price Trends</h3>
+          <p class="text-muted" style="margin:.25rem 0 0;font-size:.85rem">Average price per kg across regional markets</p>
+        </div>
+        <div class="trend-range-switcher" role="tablist" aria-label="Time range">
+          <button class="range-btn" data-days="7" role="tab">7d</button>
+          <button class="range-btn active" data-days="30" role="tab">30d</button>
+          <button class="range-btn" data-days="90" role="tab">90d</button>
+        </div>
+      </div>
+
+      <div class="trend-canvas-wrap">
+        <canvas id="trendChart" aria-label="Market price trends chart" role="img"></canvas>
+      </div>
+
+      <div class="trend-legend" id="trendLegend"></div>
+
+      <div class="text-center mt-3">
+        <a href="/market-prices.html" class="btn btn-secondary btn-sm">Browse all market prices →</a>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -615,9 +643,13 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 });
 </script>
+<script src="/js/market-intelligence.js"></script>
 <script src="/js/main.js"></script>
 </body>
 </html>
+
+
+
 
 
 
