@@ -1074,3 +1074,202 @@ tr:hover td { background: rgba(245, 240, 230, .5); }
     transition: none !important;
   }
 }
+
+/* ---------- Live Presence Widget ---------- */
+.presence-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 900;
+  font-family: var(--font);
+}
+.presence-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .65rem 1rem;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.12);
+  cursor: pointer;
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--ink);
+  transition: all .25s ease;
+  font-family: inherit;
+}
+.presence-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.16);
+}
+.presence-toggle.has-online {
+  border-color: var(--green);
+  background: #f0fdf4;
+}
+.presence-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #9ca3af;
+  flex-shrink: 0;
+}
+.presence-toggle.has-online .presence-dot {
+  background: #4ade80;
+  box-shadow: 0 0 0 0 rgba(74,222,128,.7);
+  animation: presencePulse 2s infinite;
+}
+@keyframes presencePulse {
+  0% { box-shadow: 0 0 0 0 rgba(74,222,128,.7); }
+  70% { box-shadow: 0 0 0 8px rgba(74,222,128,0); }
+  100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); }
+}
+
+.presence-panel {
+  position: absolute;
+  bottom: calc(100% + .5rem);
+  right: 0;
+  width: 300px;
+  max-width: calc(100vw - 40px);
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 10px 40px rgba(0,0,0,.15);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(8px) scale(.96);
+  pointer-events: none;
+  transition: all .25s cubic-bezier(.4,0,.2,1);
+  transform-origin: bottom right;
+}
+.presence-panel.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.presence-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .9rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, #f0fdf4 0%, #fefce8 100%);
+}
+.presence-header strong {
+  color: var(--forest);
+  font-size: .9rem;
+}
+.presence-close {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0 .3rem;
+  font-family: inherit;
+}
+.presence-close:hover { color: var(--forest); }
+
+.presence-list {
+  max-height: 340px;
+  overflow-y: auto;
+}
+.presence-item {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .75rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  color: var(--ink);
+  transition: background .15s ease;
+}
+.presence-item:hover {
+  background: var(--beige);
+  color: var(--ink);
+}
+.presence-item:last-child { border-bottom: none; }
+
+.presence-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #14532d, #22c55e);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: .78rem;
+  flex-shrink: 0;
+}
+.presence-info { flex: 1; min-width: 0; }
+.presence-name {
+  font-weight: 700;
+  font-size: .88rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ink);
+}
+.presence-verified {
+  display: inline-block;
+  margin-left: .2rem;
+  color: var(--green);
+  font-weight: 800;
+}
+.presence-meta {
+  font-size: .75rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.presence-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 .4rem;
+  background: #dcfce7;
+  color: var(--forest);
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.presence-empty {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: .85rem;
+}
+
+.presence-footer {
+  padding: .75rem 1rem;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  background: #fafafa;
+}
+.presence-footer a {
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--forest);
+}
+
+@media (max-width: 600px) {
+  .presence-widget { bottom: 12px; right: 12px; }
+  .presence-panel { width: calc(100vw - 24px); right: 0; }
+  .presence-toggle { padding: .55rem .85rem; font-size: .8rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .presence-toggle,
+  .presence-panel,
+  .presence-dot {
+    transition: none !important;
+    animation: none !important;
+  }
+}

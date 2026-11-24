@@ -54,6 +54,7 @@ app.use('/api/reviews', require('./routes/reviewRoutes'));
 app.use('/api/filter-presets', require('./routes/filterPresetRoutes'));
 app.use('/api/activity', require('./routes/activityRoutes'));
 app.use('/api/stats', require('./routes/statsRoutes'));
+app.use('/api/presence', require('./routes/presenceRoutes'));
 
 app.get('*', (req, res, next) => {
   if (req.originalUrl.startsWith('/api')) return next();
@@ -70,6 +71,7 @@ connectDB().then(() => {
     console.log(`[server] Listening on http://localhost:${PORT}`);
   });
 });
+
 
 
 

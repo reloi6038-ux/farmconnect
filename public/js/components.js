@@ -1,4 +1,4 @@
-﻿function toast(msg, type) {
+function toast(msg, type) {
   let wrap = document.querySelector('.toast-wrap');
   if (!wrap) {
     wrap = document.createElement('div');
@@ -127,6 +127,7 @@ function skeletonCards(n) {
 document.addEventListener('DOMContentLoaded', () => {
   renderNavbar();
   renderBreadcrumbs();
+  renderPresenceWidget();
   renderFooter();
 });
 
@@ -232,4 +233,128 @@ function renderBreadcrumbs(items) {
 
 window.renderBreadcrumbs = renderBreadcrumbs;
 window.getBreadcrumbsFromPath = getBreadcrumbsFromPath;
+
+
+// ---------- Live Presence Widget ----------
+function renderPresenceWidget() {
+  // Don't show on admin pages
+  if (location.pathname.startsWith('/admin/')) return;
+
+  // Create the widget container
+  const widget = document.createElement('div');
+  widget.id = 'presenceWidget';
+  widget.className = 'presence-widget';
+  widget.innerHTML = `
+    <button class="presence-toggle" id="presenceToggle" aria-expanded="false" aria-controls="presencePanel" type="button">
+      <span class="presence-dot"></span>
+      <span class="presence-text" id="presenceText">Connecting…</span>
+    </button>
+    <div class="presence-panel" id="presencePanel" role="region" aria-label="Farmers online">
+      <div class="presence-header">
+        <strong>Farmers Online Now</strong>
+        <button class="presence-close" id="presenceClose" aria-label="Close" type="button">×</button>
+      </div>
+      <div class="presence-list" id="presenceList">
+        <div class="presence-empty">Loading…</div>
+      </div>
+      <div class="presence-footer">
+        <a href="/farmers.html">See all farmers →</a>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(widget);
+
+  const toggle = document.getElementById('presenceToggle');
+  const close = document.getElementById('presenceClose');
+  const panel = document.getElementById('presencePanel');
+  const text = document.getElementById('presenceText');
+  const list = document.getElementById('presenceList');
+
+  let isOpen = false;
+  let refreshTimer = null;
+
+  function openPanel() {
+    isOpen = true;
+    panel.classList.add('open');
+    toggle.setAttribute('aria-expanded', 'true');
+  }
+  function closePanel() {
+    isOpen = false;
+    panel.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+  }
+
+  toggle.onclick = () => { isOpen ? closePanel() : openPanel(); };
+  close.onclick = closePanel;
+
+  // Close on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isOpen) closePanel();
+  });
+
+  async function loadPresence() {
+    try {
+      const res = await fetch('/api/presence/farmers-online');
+      const data = await res.json();
+      if (!data.success) throw new Error('Bad response');
+
+      if (data.count === 0) {
+        text.textContent = 'No farmers online';
+        toggle.classList.remove('has-online');
+        list.innerHTML = `
+          <div class="presence-empty">
+            <p>No farmers are online right now.</p>
+            <p style="font-size:.78rem;margin-top:.5rem;color:var(--muted)">Check back soon or browse listings.</p>
+          </div>`;
+      } else {
+        text.textContent = `${data.count} farmer${data.count === 1 ? '' : 's'} online`;
+        toggle.classList.add('has-online');
+
+        list.innerHTML = data.farmers.map((f) => `
+          <a href="/marketplace.html?state=${encodeURIComponent(f.state || '')}" class="presence-item">
+            <div class="presence-avatar">${initialsOf(f.name)}</div>
+            <div class="presence-info">
+              <div class="presence-name">${escapeHtml(f.name)} ${f.verified ? '<span class="presence-verified" title="Verified">✓</span>' : ''}</div>
+              <div class="presence-meta">${escapeHtml(f.location || '')}${f.location && f.state ? ', ' : ''}${escapeHtml(f.state || '')}</div>
+            </div>
+            <div class="presence-count">${f.activeListings}</div>
+          </a>
+        `).join('');
+      }
+    } catch (e) {
+      console.warn('[presence]', e);
+      text.textContent = 'Online now';
+      toggle.classList.remove('has-online');
+      list.innerHTML = `<div class="presence-empty">Unable to load</div>`;
+    }
+  }
+
+  function initialsOf(name) {
+    return (name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // Initial load
+  loadPresence();
+
+  // Refresh every 60 seconds
+  refreshTimer = setInterval(loadPresence, 60000);
+
+  // Pause refresh when tab is hidden
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      clearInterval(refreshTimer);
+    } else {
+      loadPresence();
+      refreshTimer = setInterval(loadPresence, 60000);
+    }
+  });
+}
+
+window.renderPresenceWidget = renderPresenceWidget;
 

@@ -1,5 +1,6 @@
-﻿const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { trackPresence } = require('./presenceMiddleware');
 
 const protect = async (req, res, next) => {
   try {
@@ -18,6 +19,8 @@ const protect = async (req, res, next) => {
     }
     req.user = user;
     next();
+      // Presence tracking (fire-and-forget)
+      if (trackPresence) trackPresence(req, res, () => {});
   } catch (err) {
     return res.status(401).json({ success: false, message: 'Invalid or expired token' });
   }
@@ -31,3 +34,4 @@ const authorize = (...roles) => (req, res, next) => {
 };
 
 module.exports = { protect, authorize };
+

@@ -1,4 +1,4 @@
-﻿const mongoose = require('mongoose');
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
@@ -18,7 +18,8 @@ const userSchema = new mongoose.Schema({
   address: { type: String, default: '' },
   bio: { type: String, default: '', maxlength: 500 },
   verified: { type: Boolean, default: false },
-  lastLogin: { type: Date }
+  lastLogin: { type: Date },
+  lastSeen: { type: Date, default: Date.now, index: true }
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {
@@ -33,3 +34,4 @@ userSchema.methods.matchPassword = async function (entered) {
 };
 
 module.exports = mongoose.model('User', userSchema);
+
