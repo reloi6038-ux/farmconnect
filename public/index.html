@@ -107,11 +107,12 @@
   <div class="container">
     <h2 class="section-title">Empowering Nigerian Agriculture</h2>
     <p class="section-sub">A transparent marketplace built for farmers, buyers, and everyone in between.</p>
-    <div class="stat-grid">
-      <div class="stat-card"><div class="stat-num" data-count="2500">0</div><div class="stat-label">Farmers Connected</div></div>
-      <div class="stat-card"><div class="stat-num" data-count="8500">0</div><div class="stat-label">Produce Listings</div></div>
-      <div class="stat-card"><div class="stat-num" data-count="1200">0</div><div class="stat-label">Active Buyers</div></div>
-      <div class="stat-card"><div class="stat-num" data-count="36">0</div><div class="stat-label">States Covered</div></div>
+    <div class="stat-grid" id="liveStatsGrid">
+      <div class="stat-card"><div class="stat-num" id="statFarmers" data-count="0">0</div><div class="stat-label">Farmers Connected</div></div>
+      <div class="stat-card"><div class="stat-num" id="statListings" data-count="0">0</div><div class="stat-label">Active Listings</div></div>
+      <div class="stat-card"><div class="stat-num" id="statBuyers" data-count="0">0</div><div class="stat-label">Active Buyers</div></div>
+      <div class="stat-card"><div class="stat-num" id="statPrices" data-count="0">0</div><div class="stat-label">Market Prices Tracked</div></div>
+      <div class="stat-card"><div class="stat-num" id="statRating" data-count="0">0</div><div class="stat-label">Average Rating</div></div>
     </div>
   </div>
 </section>
@@ -452,6 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <script src="/js/main.js"></script>
 </body>
 </html>
+
 
 
 

@@ -142,3 +142,76 @@
     } catch (e) { console.warn('[journey stats]', e); }
   })();
 })();
+
+// ---------- Live Stats Bar (real numbers from DB) ----------
+(function () {
+  const grid = document.getElementById('liveStatsGrid');
+  if (!grid) return;
+
+  function animateCount(el, target, duration) {
+    target = Number(target) || 0;
+    // Handle decimals (e.g. 4.8 for rating)
+    const isDecimal = !Number.isInteger(target);
+    const startTime = performance.now();
+    function tick(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+      const value = target * eased;
+      el.textContent = isDecimal ? value.toFixed(1) : Math.round(value).toLocaleString();
+      if (progress < 1) requestAnimationFrame(tick);
+      else el.textContent = isDecimal ? target.toFixed(1) : target.toLocaleString();
+    }
+    requestAnimationFrame(tick);
+  }
+
+  async function loadLiveStats() {
+    try {
+      const [statsRes, pricesRes] = await Promise.all([
+        fetch('/api/stats/public').then(r => r.json()),
+        fetch('/api/market-prices?limit=1').then(r => r.json())
+      ]);
+
+      if (!statsRes.success) throw new Error('Stats fetch failed');
+      const s = statsRes.data;
+      const priceCount = pricesRes.success && pricesRes.pagination ? pricesRes.pagination.totalItems : 0;
+
+      // Update each stat element's data-count and trigger animation
+      const updates = [
+        ['statFarmers', s.farmers],
+        ['statListings', s.activeListings],
+        ['statBuyers', s.buyers],
+        ['statPrices', priceCount],
+        ['statRating', s.avgRating]
+      ];
+
+      updates.forEach(([id, value]) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.dataset.count = value;
+          // Start from 0 then animate to target
+          el.textContent = '0';
+          setTimeout(() => animateCount(el, value, 1200), 100);
+        }
+      });
+    } catch (e) {
+      console.warn('[live-stats]', e);
+      // Fallback: leave the counters at 0
+    }
+  }
+
+  // Trigger when the section scrolls into view (better UX than on load)
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          loadLiveStats();
+          observer.unobserve(grid);
+        }
+      });
+    }, { threshold: 0.3 });
+    observer.observe(grid);
+  } else {
+    loadLiveStats();
+  }
+})();
