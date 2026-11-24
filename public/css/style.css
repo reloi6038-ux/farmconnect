@@ -406,3 +406,42 @@ tr:hover td { background: rgba(245, 240, 230, .5); }
   .activity-time { display: none; }
   .activity-text { font-size: .82rem; }
 }
+
+/* ---------- Price Comparison Widget ---------- */
+.compare-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .22rem .55rem;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .01em;
+  white-space: nowrap;
+}
+.compare-good { background: #dcfce7; color: #14532d; }
+.compare-fair { background: #fef3c7; color: #92400e; }
+.compare-high { background: #fee2e2; color: #991b1b; }
+.compare-none { background: #f3f4f6; color: #6b7280; }
+
+.compare-card {
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+}
+.compare-card.compare-good { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-color: #86efac; }
+.compare-card.compare-fair { background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%); border-color: #fde047; }
+.compare-card.compare-high { background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-color: #fca5a5; }
+.compare-card.compare-none { background: #f9fafb; }
+
+.compare-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .4rem .75rem;
+  margin-top: .75rem;
+  font-size: .85rem;
+}
+@media (max-width: 480px) {
+  .compare-details { grid-template-columns: 1fr; }
+}

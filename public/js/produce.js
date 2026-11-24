@@ -1,4 +1,4 @@
-﻿const produceId = new URLSearchParams(location.search).get('id');
+const produceId = new URLSearchParams(location.search).get('id');
 let currentProduce = null;
 
 async function loadDetails() {
@@ -16,6 +16,16 @@ async function loadDetails() {
         { label: p.category && p.category.name ? p.category.name : 'Produce', href: '/marketplace.html?category=' + (p.category ? p.category._id : '') },
         { label: p.productName }
       ]);
+    }
+
+    // Price comparison card
+    if (window.MarketCompare) {
+      try {
+        const marketPrices = await window.MarketCompare.load();
+        const cmp = window.MarketCompare.compare(p, marketPrices);
+        const box = document.getElementById('priceCompareBox');
+        if (box) box.innerHTML = window.MarketCompare.renderFullCard(cmp, p);
+      } catch (e) { console.warn('[compare]', e); }
     }
     const farmer = p.farmer || {};
     const cat = p.category || {};
@@ -47,6 +57,8 @@ async function loadDetails() {
             <div><span class="text-muted">Views:</span> <strong>${p.views || 0}</strong></div>
             <div><span class="text-muted">Saved:</span> <strong>${p.favoriteCount || 0}</strong></div>
           </div>
+
+          <div id="priceCompareBox"></div>
 
           <div class="card" style="background:var(--beige);border:none"><div class="card-body">
             <div class="flex items-center gap-2">
@@ -279,6 +291,7 @@ function initProduceReviewForm() {
     s.addEventListener('click', () => { current = Number(s.dataset.val); ratingInput.value = current; paint(current); });
   });
 }
+
 
 
 

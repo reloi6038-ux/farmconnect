@@ -1,4 +1,4 @@
-﻿const MAX_PRICE = 10000;
+const MAX_PRICE = 10000;
 let page = 1;
 let categories = [];
 
@@ -148,6 +148,11 @@ function renderCard(p) {
         <div class="meta">${p.quantity} ${escapeHtml(p.unit)} available</div>
         <div class="meta">📍 ${escapeHtml(p.location)}, ${escapeHtml(p.state)}</div>
         ${p.reviewCount > 0 ? `<div class="farmer-line"><span class="stars">${Array.from({length:5}, (_,i) => `<span class="${i < Math.round(p.rating) ? 'filled' : ''}">★</span>`).join('')}</span> <span style="font-size:.8rem;color:var(--muted);margin-left:.25rem">${p.rating} (${p.reviewCount})</span></div>` : ''}
+        ${(() => {
+          if (!window.MarketCompare) return '';
+          const cmp = window.MarketCompare.compare(p, window._marketPrices || []);
+          return `<div style="margin-top:.4rem">${window.MarketCompare.renderBadge(cmp)}</div>`;
+        })()}
         <div class="farmer-line">👨‍🌾 ${escapeHtml(p.farmer && p.farmer.name || 'Farmer')} ${p.farmer && p.farmer.verified ? '✅' : ''}</div>
         <a href="/produce-details.html?id=${p._id}" class="btn btn-primary btn-sm btn-block" style="margin-top:.5rem">View Details</a>
       </div>
@@ -175,6 +180,10 @@ async function load() {
   const grid = $('grid');
   grid.innerHTML = skeletonCards(8);
   const filters = readFilters();
+
+  // Preload market prices for price comparison badges
+  const marketPrices = window.MarketCompare ? await window.MarketCompare.load() : [];
+  window._marketPrices = marketPrices;
   writeUrl(filters);
   renderChips(filters);
 
@@ -298,5 +307,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Mobile toggle
   $('mobileFilterToggle').onclick = () => $('filterPanel').classList.toggle('open');
 });
+
 
 
