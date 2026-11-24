@@ -317,3 +317,92 @@ tr:hover td { background: rgba(245, 240, 230, .5); }
 }
 #breadcrumbs nav ol li a:hover { color: var(--green); text-decoration: underline; }
 #breadcrumbs nav ol li a { transition: color .15s ease; }
+
+/* ---------- Live Activity Ticker ---------- */
+.activity-ticker-wrap {
+  background: linear-gradient(90deg, #f0fdf4 0%, #fefce8 100%);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: .65rem 0;
+  position: relative;
+  overflow: hidden;
+}
+.activity-ticker {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 32px;
+}
+.activity-ticker-label {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .3rem .7rem;
+  background: var(--forest);
+  color: #fff;
+  border-radius: 999px;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 0 0 rgba(74, 222, 128, .7);
+  animation: livePulse 2s infinite;
+}
+@keyframes livePulse {
+  0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, .7); }
+  70% { box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+}
+.activity-ticker-track {
+  flex: 1;
+  position: relative;
+  height: 32px;
+  overflow: hidden;
+}
+.activity-item {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .9rem;
+  color: var(--ink);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .4s ease, transform .4s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.activity-item.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+.activity-icon { font-size: 1.05rem; flex-shrink: 0; }
+.activity-text { font-weight: 500; }
+.activity-detail { color: var(--muted); font-size: .85rem; margin-left: .3rem; }
+.activity-time {
+  color: var(--muted);
+  font-size: .75rem;
+  margin-left: auto;
+  padding-left: 1rem;
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot { animation: none; }
+  .activity-item { transition: none; }
+}
+
+@media (max-width: 768px) {
+  .activity-detail { display: none; }
+  .activity-time { display: none; }
+  .activity-text { font-size: .82rem; }
+}
