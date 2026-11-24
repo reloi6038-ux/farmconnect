@@ -295,3 +295,110 @@
     }
   })();
 })();
+
+// ---------- FAQ Accordion ----------
+(function () {
+  const list = document.getElementById('faqList');
+  if (!list) return;
+
+  const items = Array.from(list.querySelectorAll('.faq-item'));
+  const searchInput = document.getElementById('faqSearch');
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function closeItem(item) {
+    const btn = item.querySelector('.faq-question');
+    const answer = item.querySelector('.faq-answer');
+    item.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+    answer.style.maxHeight = '0px';
+  }
+
+  function openItem(item) {
+    const btn = item.querySelector('.faq-question');
+    const answer = item.querySelector('.faq-answer');
+    item.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+
+    if (prefersReduced) {
+      answer.style.maxHeight = 'none';
+    } else {
+      // Measure content height, then animate
+      answer.style.maxHeight = answer.scrollHeight + 'px';
+      // After transition, allow natural height for content reflows
+      setTimeout(() => {
+        if (item.classList.contains('open')) {
+          answer.style.maxHeight = 'none';
+        }
+      }, 350);
+    }
+  }
+
+  function toggleItem(item) {
+    const isOpen = item.classList.contains('open');
+
+    // Close all others (accordion behavior — only one open at a time)
+    items.forEach((other) => {
+      if (other !== item && other.classList.contains('open')) {
+        closeItem(other);
+      }
+    });
+
+    if (isOpen) {
+      closeItem(item);
+    } else {
+      openItem(item);
+    }
+  }
+
+  // Wire up click handlers
+  items.forEach((item) => {
+    const btn = item.querySelector('.faq-question');
+    btn.addEventListener('click', () => toggleItem(item));
+    btn.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && item.classList.contains('open')) {
+        closeItem(item);
+        btn.focus();
+      }
+    });
+  });
+
+  // Search filter
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim().toLowerCase();
+      let visibleCount = 0;
+
+      items.forEach((item) => {
+        const qText = item.querySelector('.faq-q-text').textContent.toLowerCase();
+        const aText = item.querySelector('.faq-answer-inner').textContent.toLowerCase();
+        const match = !q || qText.includes(q) || aText.includes(q);
+        item.classList.toggle('hidden-by-search', !match);
+        if (match) visibleCount++;
+      });
+
+      // Show/hide empty state
+      const existingEmpty = list.querySelector('.faq-empty');
+      if (existingEmpty) existingEmpty.remove();
+      if (visibleCount === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'faq-empty';
+        empty.innerHTML = '<p>No questions match "<strong>' + q + '</strong>". <a href="/contact.html">Contact us</a> instead.</p>';
+        list.appendChild(empty);
+      }
+    });
+  }
+
+  // Handle window resize — recalculate open answers (content may reflow)
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      items.forEach((item) => {
+        if (item.classList.contains('open')) {
+          const answer = item.querySelector('.faq-answer');
+          answer.style.maxHeight = 'none';
+        }
+      });
+    }, 150);
+  });
+})();
