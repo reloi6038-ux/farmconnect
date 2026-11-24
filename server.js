@@ -1,4 +1,4 @@
-﻿require('dotenv').config();
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
@@ -53,6 +53,7 @@ app.use('/api/contact', require('./routes/contactRoutes'));
 app.use('/api/reviews', require('./routes/reviewRoutes'));
 app.use('/api/filter-presets', require('./routes/filterPresetRoutes'));
 app.use('/api/activity', require('./routes/activityRoutes'));
+app.use('/api/stats', require('./routes/statsRoutes'));
 
 app.get('*', (req, res, next) => {
   if (req.originalUrl.startsWith('/api')) return next();
@@ -69,6 +70,7 @@ connectDB().then(() => {
     console.log(`[server] Listening on http://localhost:${PORT}`);
   });
 });
+
 
 
 

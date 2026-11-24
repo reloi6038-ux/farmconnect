@@ -96,3 +96,49 @@
     }
   });
 })();
+
+// ---------- Farm-to-Table Timeline ----------
+(function () {
+  const timeline = document.getElementById('journeyTimeline');
+  if (!timeline) return;
+
+  // Reveal on scroll
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          timeline.classList.add('revealed');
+          observer.unobserve(timeline);
+        }
+      });
+    }, { threshold: 0.2 });
+    observer.observe(timeline);
+  } else {
+    timeline.classList.add('revealed');
+  }
+
+  // Load real stats and update tooltips
+  (async function loadStats() {
+    try {
+      const res = await fetch('/api/stats/public');
+      const data = await res.json();
+      if (!data.success) return;
+      const s = data.data;
+
+      const tooltips = {
+        '1': `${s.farmers} farmers in network`,
+        '2': `13 produce categories`,
+        '3': `${s.activeListings} active listings`,
+        '4': `${s.produce} produce items listed`,
+        '5': `${s.enquiries} enquiries sent`,
+        '6': `${s.avgRating} / 5 average rating`
+      };
+
+      timeline.querySelectorAll('.journey-stage').forEach((stage) => {
+        const n = stage.dataset.stage;
+        const tip = stage.querySelector('.journey-tooltip');
+        if (tip && tooltips[n]) tip.textContent = tooltips[n];
+      });
+    } catch (e) { console.warn('[journey stats]', e); }
+  })();
+})();
